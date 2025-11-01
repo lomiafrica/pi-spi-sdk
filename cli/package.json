@@ -1,0 +1,60 @@
+{
+  "name": "@lomi/pi-spi-sdk",
+  "version": "0.1.0",
+  "description": "CLI for PI-SPI SDK - Built by lomi. for the West African fintech community",
+  "type": "module",
+  "bin": {
+    "lomi.": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pi-spi",
+    "spi",
+    "bceao",
+    "west-africa",
+    "uemoa",
+    "payment",
+    "interoperability",
+    "cli",
+    "lomi",
+    "fintech",
+    "sdk"
+  ],
+  "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
+  "license": "MIT",
+  "homepage": "https://github.com/lomiafrica/pi-spi-sdk",
+  "bugs": {
+    "url": "https://github.com/lomiafrica/pi-spi-sdk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lomiafrica/pi-spi-sdk.git",
+    "directory": "cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
+  }
+}
+

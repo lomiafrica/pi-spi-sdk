@@ -1,0 +1,77 @@
+{
+  "name": "@lomi/pi-spi-sdk",
+  "version": "0.1.0",
+  "description": "Official TypeScript SDK for PI-SPI (Plateforme d'Interopérabilité) API - Built by lomi. for the West African fintech community",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate": "node scripts/pre-generate.js && openapi --input ./openapi.json --output ./src/generated --client axios --useOptions && node scripts/post-generate.js",
+    "prepublishOnly": "npm run generate && npm run build"
+  },
+  "keywords": [
+    "pi-spi",
+    "spi",
+    "bceao",
+    "west-africa",
+    "uemoa",
+    "payment",
+    "interoperability",
+    "mobile-money",
+    "xof",
+    "cfa-franc",
+    "fintech",
+    "sdk",
+    "typescript",
+    "api-client",
+    "benin",
+    "burkina-faso",
+    "ivory-coast",
+    "mali",
+    "niger",
+    "senegal",
+    "togo",
+    "guinea-bissau"
+  ],
+  "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
+  "license": "MIT",
+  "homepage": "https://github.com/lomiafrica/pi-spi-sdk",
+  "bugs": {
+    "url": "https://github.com/lomiafrica/pi-spi-sdk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lomiafrica/pi-spi-sdk.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "form-data": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/form-data": "^2.5.2",
+    "@types/node": "^20.10.6",
+    "openapi-typescript-codegen": "^0.29.0",
+    "typescript": "^5.3.3"
+  }
+}
+
