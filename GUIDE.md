@@ -7,30 +7,30 @@ For developers contributing to the SDK or using it in advanced scenarios.
 The SDK uses a service-based architecture with auto-generated code from OpenAPI:
 
 ```
-┌───────────────────────────────────────────────┐
-│                Application Code               │
-└───────────────────────┬───────────────────────┘
-                        │
-┌───────────────────────▼───────────────────────┐
-│              PiSpiSDK (Main Class)            │
-│   - Configuration management                  │
-│   - Error handling                            │
-│   - Service orchestration                     │
-└──────┬──────────┬──────────┬──────────┬───────┘
-       │          │          │          │
-  ┌────▼────┐ ┌───▼───┐ ┌────▼────┐ ┌───▼─────┐
-  │ Comptes │ │Alias  │ │Paiements│ │ Webhooks│
-  │ Service │ │Service│ │ Service │ │ Service │
-  └────┬────┘ └───┬───┘ └────┬────┘ └───┬─────┘
-       │          │          │          │
-  ┌────▼──────────▼──────────▼──────────▼────┐
-  │         Generated Services Layer         │
-  └─────────────────────┬────────────────────┘
-                        │
-  ┌─────────────────────▼────────────────────┐
-  │              PI-SPI REST API             │
-  │       (OAuth2 + mTLS Authentication)     │
-  └──────────────────────────────────────────┘
+ ┌───────────────────────────────────────────────┐
+ │                Application Code               │
+ └───────────────────────┬───────────────────────┘
+                         │
+ ┌───────────────────────▼───────────────────────┐
+ │              PiSpiSDK (Main Class)            │
+ │   - Configuration management                  │
+ │   - Error handling                            │
+ │   - Service orchestration                     │
+ └──────┬──────────┬──────────┬──────────┬───────┘
+        │          │          │          │
+   ┌────▼────┐ ┌───▼───┐ ┌────▼────┐ ┌───▼─────┐
+   │ Comptes │ │ Alias │ │Paiements│ │ Webhooks│
+   │ Service │ │Service│ │ Service │ │ Service │
+   └────┬────┘ └───┬───┘ └────┬────┘ └───┬─────┘
+        │          │          │          │
+   ┌────▼──────────▼──────────▼──────────▼────┐
+   │         Generated Services Layer         │
+   └─────────────────────┬────────────────────┘
+                         │
+   ┌─────────────────────▼────────────────────┐
+   │              PI-SPI REST API             │
+   │      (OAuth2 + mTLS Authentication)      │
+   └──────────────────────────────────────────┘
 ```
 
 ### Key components
