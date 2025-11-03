@@ -2,7 +2,10 @@
 
 > **This repository is a contribution from open-source payment processing company [lomi.](https://lomi.africa)**
 
-TypeScript SDK for PI-SPI (La Plateforme d'Interopérabilité du Service de Paiement Instantané) Business API - a payment interoperability platform by BCEAO (Banque Centrale des États de l'Afrique de l'Ouest).
+The Interoperable Platform for the Instant Payment System (π-SPI) is a regional payment infrastructure designed and operated by the Central Bank of West African States (BCEAO).
+
+It enables instant fund transfers between different financial institutions across the region, including banks, electronic money issuers, microfinance institutions, and payment establishments.
+
 
 ## Installation
 
@@ -13,27 +16,13 @@ npm install @lomi/pi-spi-sdk
 # or
 yarn add @lomi/pi-spi-sdk
 ```
+π-SPI enables **cross-border transactions** within the West African Economic and Monetary Union (UEMOA), which spans eight countries: Benin, Burkina Faso, Côte d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal, and Togo. 
 
-## About PI-SPI
-
-PI-SPI enables **cross-border transactions** within the West African Economic and Monetary Union (UEMOA):
-
-- **8 countries**: Benin, Burkina Faso, Côte d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal, Togo
-- **Single currency**: XOF (West African CFA Franc)
-- **Real-time processing**: Instant payment confirmation
-- **Alias-based payments**: Send payments without sharing account numbers
+The infrastructure operates on a single currency, the XOF (West African CFA Franc), and processes payments in real-time with instant confirmation. Users can send payments using alias-based methods, which means they don't need to share their actual account numbers.
 
 **Transaction types supported:**
-PI-SPI supports seamless interoperability between different payment systems:
 
-- **Bank-to-Bank**: Payments between traditional bank accounts across UEMOA countries
-- **Bank-to-Wallet**: Payments from bank accounts to mobile money wallets (MTN, Orange Money, Moov, etc.)
-- **Wallet-to-Bank**: Payments from mobile wallets to bank accounts
-- **Wallet-to-Wallet**: Payments between mobile money wallets, regardless of provider
-
-All transaction types work seamlessly through the unified PI-SPI platform, enabling businesses and individuals to send and receive payments across different financial institutions and mobile money providers within the UEMOA region.
-
-**Limitations**: XOF currency only, UEMOA region only (not global).
+π-SPI supports seamless interoperability between different payment systems throughout the region. Payments can flow between traditional bank accounts across UEMOA countries, from bank accounts to mobile money wallets like MTN, Orange Money, and Moov, from mobile wallets back to bank accounts, and even between mobile money wallets regardless of which provider each person uses. All these transaction types work seamlessly through the unified infrastructure, enabling businesses and individuals to send and receive payments across different financial institutions and mobile money providers within the UEMOA region.
 
 ## Usage example
 
@@ -59,12 +48,7 @@ const payment = await sdk.paiements.create({
 
 ## Features
 
-- ✅ **Type-safe**: Full TypeScript support with generated types from OpenAPI spec
-- ✅ **OAuth2 + mTLS**: Secure authentication support
-- ✅ **Comprehensive API coverage**: All PI-SPI endpoints available
-- ✅ **Error handling**: Custom error classes with detailed messages
-- ✅ **Auto-generated**: Code generated from official OpenAPI specification
-- ✅ **Developer-friendly**: Comprehensive utilities and constants included
+This SDK provides full TypeScript support with types generated from the official OpenAPI specification, ensuring type safety throughout your integration. It includes secure authentication through OAuth2 and mTLS, comprehensive coverage of all Π-SPI endpoints, and custom error classes with detailed messages for easier debugging. The codebase is auto-generated from the official specification and includes developer-friendly utilities and constants to streamline your implementation.
 
 ## Utilities & Constants
 
@@ -258,6 +242,8 @@ try {
 
 ### Filtering & pagination
 
+The SDK includes a QueryBuilder that allows you to construct complex queries with multiple filters, sorting, and pagination. You can chain filter conditions using various operators, sort results in ascending or descending order (use `-` prefix for descending), and control pagination with page number and size parameters.
+
 ```typescript
 import { QueryBuilder } from '@lomi/pi-spi-sdk';
 
@@ -272,31 +258,17 @@ const query = new QueryBuilder()
 const payments = await sdk.paiements.list(query);
 ```
 
-**Supported operators**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `contains`, `notContains`, `beginsWith`, `endsWith`, `exists`
+The QueryBuilder supports these operators: `eq` (equals), `ne` (not equals), `gt` (greater than), `gte` (greater than or equal), `lt` (less than), `lte` (less than or equal), `in` (in array), `contains`, `notContains`, `beginsWith`, `endsWith`, and `exists`.
 
 ## Alias types
 
-PI-SPI supports three types of account aliases:
+Π-SPI supports three types of account aliases that allow users to send and receive payments without sharing their full account numbers:
 
-### SHID (System-Hosted Identifier)
+**SHID (System-Hosted Identifier)** is a system-generated UUID (36 characters, such as `8b1b2499-3e50-435b-b757-ac7a83d8aa7f`) available for all client types and serves as a general-purpose payment address.
 
-- **Format**: UUID (36 characters), e.g., `8b1b2499-3e50-435b-b757-ac7a83d8aa7f`
-- **Generation**: System-generated when created
-- **Available for**: All client types (P, C, B, G)
-- **Use case**: General purpose payment address
+**MCOD (Merchant Code)** is an alphanumeric code (like `SNF00_2E4TY`) that's system-generated and available exclusively for business clients (C, B, G), primarily used for USSD payment support.
 
-### MCOD (Merchant Code)
-
-- **Format**: Alphanumeric code, e.g., `SNF00_2E4TY`
-- **Generation**: System-generated when created
-- **Available for**: Business clients only (C, B, G)
-- **Use case**: USSD payment support
-
-### MBNO (Mobile Number)
-
-- **Format**: Phone number format
-- **Available for**: Individual clients only (P)
-- **Use case**: Mobile money integration
+**MBNO (Mobile Number)** uses phone number format and is available only for individual clients (P), designed specifically for mobile money integration.
 
 **Example:**
 
@@ -319,7 +291,7 @@ if (isValidAliasType('SHID')) {
 
 ## Support
 
-- **PI-SPI API**: [pisfn-sandbox@bceao.int](mailto:pisfn-sandbox@bceao.int)
+- **Π-SPI API**: [pisfn-sandbox@bceao.int](mailto:pisfn-sandbox@bceao.int)
 - **SDK Support**: [hello@lomi.africa](mailto:hello@lomi.africa)
 - **Documentation**: [https://developers.pi-bceao.com](https://developers.pi-bceao.com)
 
