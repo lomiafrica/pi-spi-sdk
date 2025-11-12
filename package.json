@@ -1,7 +1,7 @@
 {
   "name": "pi-spi-sdk",
   "version": "0.1.0",
-  "description": "Official TypeScript SDK for PI-SPI Business API - Built by lomi. for the West African fintech community",
+  "description": "TypeScript SDK for the π-SPI Business API. Built by lomi. for the West African fintech community",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -50,7 +50,7 @@
     "togo",
     "guinea-bissau"
   ],
-  "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
+  "author": "Babacar Diop <babacar@lomi.africa> (https://lomi.africa)",
   "license": "MIT",
   "homepage": "https://github.com/lomiafrica/pi-spi-sdk",
   "bugs": {

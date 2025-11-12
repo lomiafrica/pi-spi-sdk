@@ -1,4 +1,4 @@
-# @lomi/pi-spi-sdk
+# pi-spi-sdk
 
 > **This repository is a contribution from open-source payment processing company [lomi.](https://lomi.africa)**
 
