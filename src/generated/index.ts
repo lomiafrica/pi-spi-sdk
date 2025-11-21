@@ -6,7 +6,6 @@ export { ApiError } from './core/ApiError';
 export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
-
 export type { AliasCreationReponse } from './models/AliasCreationReponse';
 export type { AliasCreationRequest } from './models/AliasCreationRequest';
 export type { AliasReponseListe } from './models/AliasReponseListe';
@@ -72,7 +71,6 @@ export type { WebhookEventsList } from './models/WebhookEventsList';
 export type { WebhookList } from './models/WebhookList';
 export type { WebhookModificationRequest } from './models/WebhookModificationRequest';
 export { WebhooksEvents } from './models/WebhooksEvents';
-
 export { AliasService } from './services/AliasService';
 export { ComptesService } from './services/ComptesService';
 export { DemandeAnnulationService } from './services/DemandeAnnulationService';
