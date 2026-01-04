@@ -10,6 +10,10 @@ export { PiSpiSDK } from './sdk';
 // Export configuration types
 export type { PiSpiConfig } from './config';
 
+// Export QR Code types and utilities
+export * from './qrcode';
+
+
 // Export error classes
 export {
   PiSpiError,

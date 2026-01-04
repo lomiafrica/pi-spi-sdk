@@ -160,6 +160,36 @@ await sdk.paiements.list({
 });
 ```
 
+#### QR Codes
+
+Generate EMV-compliant QR codes directly from the SDK.
+
+```typescript
+// Generate raw payload string
+const payload = sdk.qr.payload({
+  alias: '3497a720-ab11-4973-9619-534e04f263a1',
+  countryCode: 'CI',
+  qrType: 'STATIC',
+  referenceLabel: 'MA_BOUTIQUE_01',
+});
+
+// Generate SVG with official PI-SPI logo
+const svg = await sdk.qr.svg({
+  alias: '3497a720-ab11-4973-9619-534e04f263a1',
+  countryCode: 'CI',
+  qrType: 'DYNAMIC',
+  referenceLabel: 'TX-12345',
+  amount: 5000
+}, { size: 300 });
+
+// Validate external QR code content
+const check = sdk.qr.validate(someQrString);
+if (check.valid) {
+  console.log("Valid QR for:", check.data?.alias);
+}
+```
+
+
 #### Aliases
 
 ```typescript

@@ -7,6 +7,7 @@
 
 import { handleApiError } from './error-handler';
 import type { PiSpiConfig } from './config';
+import { ApiConfig } from './services/base';
 import { ComptesService } from './services/comptes';
 import { AliasService } from './services/alias';
 import { WebhooksService } from './services/webhooks';
@@ -16,10 +17,11 @@ import { PaiementsService } from './services/paiements';
 import { PaiementsEnMasseService } from './services/paiements-en-masse';
 import { RetoursFondsService } from './services/retours-fonds';
 import { DemandesAnnulationService } from './services/demandes-annulation';
+import { QRCode } from './qrcode';
 
 // OpenAPI will be imported from generated code after running pnpm run generate
 // For now, we'll use a dynamic import approach
-let OpenAPI: any;
+let OpenAPI: ApiConfig;
 
 // Try to import generated OpenAPI config
 async function loadOpenAPI() {
@@ -92,6 +94,15 @@ export class PiSpiSDK {
   public readonly demandesAnnulation: DemandesAnnulationService;
 
   /**
+   * QR Code utilities
+   * Generate and validate BCEAO compatible QR codes
+   */
+  public readonly qr = QRCode;
+
+  // Key to store internal config reference
+  private _config: ApiConfig;
+
+  /**
    * Initialize the PI-SPI SDK
    *
    * @param config - SDK configuration
@@ -107,39 +118,36 @@ export class PiSpiSDK {
   constructor(config: PiSpiConfig) {
     // Initialize OpenAPI configuration synchronously
     // Note: This will work better after code generation when OpenAPI is properly exported
+    
+    // Default config object
+    this._config = {
+        BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
+        TOKEN: config.accessToken,
+        HEADERS: {
+          ...config.headers,
+        },
+    };
+
     try {
       // In a real scenario, we'd import this properly
       // For now, we'll set it up directly
-      OpenAPI = {
-        BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
-        TOKEN: config.accessToken,
-        HEADERS: {
-          ...config.headers,
-          Authorization: `Bearer ${config.accessToken}`,
-        },
-      };
+      OpenAPI = this._config;
+      // Also maintain the module level variable for backward compat if any
     } catch {
       // Fallback configuration
-      OpenAPI = {
-        BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
-        TOKEN: config.accessToken,
-        HEADERS: {
-          ...config.headers,
-          Authorization: `Bearer ${config.accessToken}`,
-        },
-      };
+      OpenAPI = this._config;
     }
 
-    // Initialize services
-    this.comptes = new ComptesService();
-    this.alias = new AliasService();
-    this.webhooks = new WebhooksService();
-    this.demandesPaiement = new DemandesPaiementService();
-    this.demandesPaiementEnMasse = new DemandesPaiementEnMasseService();
-    this.paiements = new PaiementsService();
-    this.paiementsEnMasse = new PaiementsEnMasseService();
-    this.retoursFonds = new RetoursFondsService();
-    this.demandesAnnulation = new DemandesAnnulationService();
+    // Initialize services with config
+    this.comptes = new ComptesService(this._config);
+    this.alias = new AliasService(this._config);
+    this.webhooks = new WebhooksService(this._config);
+    this.demandesPaiement = new DemandesPaiementService(this._config);
+    this.demandesPaiementEnMasse = new DemandesPaiementEnMasseService(this._config);
+    this.paiements = new PaiementsService(this._config);
+    this.paiementsEnMasse = new PaiementsEnMasseService(this._config);
+    this.retoursFonds = new RetoursFondsService(this._config);
+    this.demandesAnnulation = new DemandesAnnulationService(this._config);
   }
 
   /**
@@ -147,6 +155,10 @@ export class PiSpiSDK {
    * Useful when tokens are refreshed
    */
   setAccessToken(token: string): void {
+    if (this._config) {
+        this._config.TOKEN = token;
+    }
+    
     if (OpenAPI) {
       OpenAPI.TOKEN = token;
       OpenAPI.HEADERS = {
@@ -160,7 +172,7 @@ export class PiSpiSDK {
    * Get the current base URL
    */
   getBaseUrl(): string {
-    return OpenAPI?.BASE || 'https://sandbox.api.pi-bceao.com/piz/v1';
+    return this._config.BASE;
   }
 }
 
