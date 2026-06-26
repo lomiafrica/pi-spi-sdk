@@ -54,10 +54,11 @@ export class AliasService extends BaseService {
    * ```
    */
   async create(alias: { compte: string; type: AliasType }) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{ cle?: string; type?: string; compte?: string }>(
+      'POST',
+      `/comptes/${encodeURIComponent(alias.compte)}/alias`,
+      { type: alias.type },
+    );
   }
 
   /**
@@ -68,10 +69,7 @@ export class AliasService extends BaseService {
    * @returns Paginated list of aliases
    */
   async list(compte: string, params?: QueryParams) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', `/comptes/${encodeURIComponent(compte)}/alias`, undefined, params);
   }
 
   /**
@@ -79,10 +77,14 @@ export class AliasService extends BaseService {
    *
    * @param alias - Alias identifier
    */
-  async delete(alias: string) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async delete(alias: string, compte?: string) {
+    if (!compte) {
+      throw new Error('Account number (compte) is required to delete an alias.');
+    }
+
+    return this.request(
+      'DELETE',
+      `/comptes/${encodeURIComponent(compte)}/alias/${encodeURIComponent(alias)}`,
+    );
   }
 }

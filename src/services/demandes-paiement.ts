@@ -106,9 +106,11 @@ export class DemandesPaiementService extends BaseService {
     refDocType?: string;
     refDocNumero?: string;
   }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{
+      statut?: string;
+      txId?: string;
+      dateLimiteReponse?: string;
+    }>('POST', '/demandes-paiements', request);
   }
 
   /**
