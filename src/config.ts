@@ -15,6 +15,11 @@ export interface PiSpiConfig {
   accessToken: string;
 
   /**
+   * Optional: undici/fetch dispatcher (e.g. mTLS Agent)
+   */
+  dispatcher?: unknown;
+
+  /**
    * Optional: Client certificate path for mTLS
    */
   clientCert?: string;

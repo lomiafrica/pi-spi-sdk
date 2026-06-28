@@ -13,6 +13,14 @@ export type { PiSpiConfig } from './config';
 // Export QR Code types and utilities
 export * from './qrcode';
 
+// Export lomi.cust consumer-presented QR helpers
+export {
+  buildLomiCustomerQr,
+  serializeLomiCustomerQr,
+  parseLomiCustomerQr,
+  type LomiCustomerQr,
+  type LomiCustomerAliasType,
+} from './customer-qr';
 
 // Export error classes
 export {
@@ -63,8 +71,6 @@ export {
   DEFAULT_LIMITS,
   WEBHOOK_EVENTS,
 } from './utils/constants';
-// Note: ALIAS_TYPES is exported from './types/alias' above
 
 // Re-export generated types and services (available after running generate)
-// These will be available once the OpenAPI codegen is run
 export * from './generated';

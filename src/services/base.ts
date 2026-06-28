@@ -8,6 +8,7 @@ export interface ApiConfig {
   BASE: string;
   TOKEN?: string;
   HEADERS?: Record<string, string>;
+  dispatcher?: unknown;
 }
 
 export abstract class BaseService {
@@ -53,19 +54,33 @@ export abstract class BaseService {
         headers['Authorization'] = `Bearer ${this.config.TOKEN}`;
       }
 
-      const response = await fetch(url.toString(), {
+      const fetchOptions: Record<string, unknown> = {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
-      });
+      };
+
+      if (this.config.dispatcher) {
+        fetchOptions.dispatcher = this.config.dispatcher;
+      }
+
+      const response = await fetch(url.toString(), fetchOptions as RequestInit);
 
       if (!response.ok) {
         // Try to parse error body
-        let errorBody;
+        let errorBody: Record<string, unknown>;
         try {
-          errorBody = await response.json();
+          const parsed = (await response.json()) as Record<string, unknown>;
+          errorBody = {
+            ...parsed,
+            status: response.status,
+            statusText: response.statusText,
+          };
         } catch {
-          errorBody = { status: response.status, statusText: response.statusText };
+          errorBody = {
+            status: response.status,
+            statusText: response.statusText,
+          };
         }
         throw errorBody; // Will be caught by execute/handleApiError
       }

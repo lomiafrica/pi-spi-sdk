@@ -59,11 +59,14 @@ export class ComptesService extends BaseService {
    * ```
    */
   async getAccount(numero: string) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      // return await DefaultService.compteSoldeConsulter({ numero });
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{
+      type?: string;
+      numero?: string;
+      solde?: number;
+      balance?: number;
+      statut?: string;
+      dateOuverture?: string;
+    }>('GET', `/comptes/${encodeURIComponent(numero)}`);
   }
 
   /**

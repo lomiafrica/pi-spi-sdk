@@ -74,9 +74,11 @@ export class WebhooksService extends BaseService {
    * ```
    */
   async create(webhook: { callbackUrl: string; events: string[]; alias?: string }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{
+      id?: string;
+      callbackUrl?: string;
+      events?: string[];
+    }>('POST', '/webhooks', webhook);
   }
 
   /**

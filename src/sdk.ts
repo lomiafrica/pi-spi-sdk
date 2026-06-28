@@ -123,6 +123,7 @@ export class PiSpiSDK {
     this._config = {
         BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
         TOKEN: config.accessToken,
+        dispatcher: config.dispatcher,
         HEADERS: {
           ...config.headers,
         },
