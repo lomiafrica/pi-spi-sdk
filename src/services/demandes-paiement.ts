@@ -133,9 +133,15 @@ export class DemandesPaiementService extends BaseService {
    * @throws {PiSpiNotFoundError} If request not found
    */
   async get(id: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{
+      statut?: string;
+      txId?: string;
+      montant?: number;
+      dateEnvoi?: string;
+      dateIrrevocabilite?: string;
+      dateRejet?: string;
+      dateLimiteReponse?: string;
+    }>('GET', `/demandes-paiements/${encodeURIComponent(id)}`);
   }
 
   /**

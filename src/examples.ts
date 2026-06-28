@@ -19,9 +19,7 @@ const sdk = new PiSpiSDK({
 // Examples: 'CIC2344256727788288822' (Côte d'Ivoire), 'SNC2344256727788288822' (Senegal)
 async function getAccountBalance() {
   const account = await sdk.comptes.getAccount('CIC2344256727788288822');
-  // @ts-expect-error - Service implementation pending code generation
   console.log('Account balance:', account?.solde ?? 'N/A');
-  // @ts-expect-error
   console.log('Account status:', account?.statut);
 }
 

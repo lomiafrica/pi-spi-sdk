@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-06-27
+
+### Added
+
+- `paiements.create`, `paiements.get`, and `demandesPaiement.get` HTTP implementations
+- `comptes.getAccount` HTTP implementation
+- `buildLomiCustomerQr`, `serializeLomiCustomerQr`, and `parseLomiCustomerQr` for consumer-presented (CPM) flows
+
+### Changed
+
+- `paiements.create` accepts `payeurAlias` or legacy `comptePayeur` alias field
+
+## [0.1.4] - 2026-06-27
+
+### Added
+
+- Optional `dispatcher` on `PiSpiConfig` / `ApiConfig` for undici mTLS `Agent` injection in Node.js
+- `webhooks.create` implemented via the HTTP request layer (no longer a stub)
+
+### Fixed
+
+- API error responses from `fetch` now include `status` / `statusText` for proper `PiSpiAuthError` mapping
+
 ## [0.1.3] - 2026-06-26
 
 ### Fixed

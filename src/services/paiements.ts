@@ -79,16 +79,36 @@ export class PaiementsService extends BaseService {
    * ```
    */
   async create(payment: {
-    comptePayeur: string;
+    comptePayeur?: string;
+    payeurAlias?: string;
     payeAlias: string;
+    comptePaye?: string;
     montant: number;
     motif: string;
     txId?: string;
     confirmation?: boolean;
     categorie?: string;
   }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
+    const txId =
+      payment.txId ??
+      `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    const payeurAlias = payment.payeurAlias ?? payment.comptePayeur;
+    if (!payeurAlias) {
+      throw new Error('payeurAlias or comptePayeur is required for SPI payouts');
+    }
+
+    return this.request<{
+      statut?: string;
+      txId?: string;
+      statutRaison?: string;
+    }>('POST', '/paiements', {
+      txId,
+      payeurAlias,
+      payeAlias: payment.payeAlias,
+      montant: payment.montant,
+      motif: payment.motif,
+      confirmation: payment.confirmation ?? false,
     });
   }
 
@@ -107,9 +127,14 @@ export class PaiementsService extends BaseService {
    * ```
    */
   async get(txId: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request<{
+      statut?: string;
+      txId?: string;
+      montant?: number;
+      dateEnvoi?: string;
+      dateIrrevocabilite?: string;
+      dateRejet?: string;
+    }>('GET', `/paiements/${encodeURIComponent(txId)}`);
   }
 
   /**
