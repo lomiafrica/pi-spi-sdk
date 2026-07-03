@@ -93,9 +93,7 @@ export class WebhooksService extends BaseService {
    * ```
    */
   async list(params?: QueryParams) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', '/webhooks', undefined, params);
   }
 
   /**
@@ -106,9 +104,7 @@ export class WebhooksService extends BaseService {
    * @throws {PiSpiNotFoundError} If webhook not found
    */
   async get(id: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', `/webhooks/${encodeURIComponent(id)}`);
   }
 
   /**
@@ -139,9 +135,11 @@ export class WebhooksService extends BaseService {
       alias?: string;
     }
   ) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request(
+      'PUT',
+      `/webhooks/${encodeURIComponent(id)}`,
+      webhook
+    );
   }
 
   /**
@@ -151,8 +149,6 @@ export class WebhooksService extends BaseService {
    * @throws {PiSpiNotFoundError} If webhook not found
    */
   async delete(id: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('DELETE', `/webhooks/${encodeURIComponent(id)}`);
   }
 }

@@ -495,7 +495,7 @@ describe('isValidPispiQrPayload diagnostics', () => {
         expect(result.errors.some((error) => error.includes('Erreur lors de l\'analyse des informations marchand'))).toBe(true);
     });
 
-    it('signale un referenceLabel manquant dans les données additionnelles', () => {
+    it('accepte une payload sans referenceLabel (Tag 05 optionnel)', () => {
         const entries = decodeSegmentEntries(basePayload());
         const additional = entries.find((entry) => entry.tag === '62');
         expect(additional).toBeDefined();
@@ -503,8 +503,8 @@ describe('isValidPispiQrPayload diagnostics', () => {
         additional!.value = encodeAdditional(additionalEntries);
         const mutated = rebuildPayload(entries);
         const result = isValidPispiQrPayload(mutated);
-        expect(result.valid).toBe(false);
-        expect(result.errors).toContain('Tag 05 (Reference Label) manquant dans les données additionnelles.');
+        expect(result.valid).toBe(true);
+        expect(result.data?.referenceLabel).toBe('');
     });
 
     it('signale un merchantChannel manquant dans les données additionnelles', () => {
@@ -703,7 +703,7 @@ describe('generateQrCodeSvg mocked matrices', () => {
         const module = await import('./index');
         const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
         expect(svg).toContain('<svg');
-        expect(svg).toContain('<circle');
+        expect(svg).toContain('<rect');
     });
 
     it('génère un SVG avec une matrice sous forme de tableau', async () => {
@@ -720,7 +720,7 @@ describe('generateQrCodeSvg mocked matrices', () => {
         const module = await import('./index');
         const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
         expect(svg).toContain('<svg');
-        expect(svg).toContain('<circle');
+        expect(svg).toContain('<rect');
     });
 
     it('génère un SVG avec une matrice à données linéaires', async () => {
@@ -737,7 +737,7 @@ describe('generateQrCodeSvg mocked matrices', () => {
         const module = await import('./index');
         const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
         expect(svg).toContain('<svg');
-        expect(svg).toContain('<circle');
+        expect(svg).toContain('<rect');
     });
 
     it('ignore les modules non reconnus', async () => {
@@ -787,5 +787,22 @@ describe('generateQrCodeSvg mocked matrices', () => {
         await expect(module.generateQrCodeSvg(input)).rejects.toThrow(
             'Le module "qrcode" n\'expose pas l\'API attendue.'
         );
+    });
+
+    it('utilise des rectangles pour les finder patterns', async () => {
+        vi.resetModules();
+        vi.doMock('qrcode', () => ({
+            create: () => ({
+                modules: {
+                    size: 21,
+                    data: Array.from({ length: 21 * 21 }, (_, i) => (i % 3 === 0 ? 1 : 0)),
+                },
+            }),
+        }));
+
+        const module = await import('./index');
+        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '', size: 210 });
+        expect(svg).toContain('<rect');
+        expect(svg.match(/<rect/g)?.length).toBeGreaterThan(3);
     });
 });

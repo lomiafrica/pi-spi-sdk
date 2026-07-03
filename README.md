@@ -162,7 +162,29 @@ await sdk.paiements.list({
 
 #### QR Codes
 
-Generate EMV-compliant QR codes directly from the SDK.
+Generate EMV-compliant QR codes directly from the SDK (parity with official `@pi-spi/qrcode@1.0.0`, plus lomi. extras).
+
+**QR-only import (browser / bundlers):**
+
+```typescript
+import { buildPayloadString, generateQrCodeSvg } from 'pi-spi-sdk/qrcode';
+```
+
+**CDN (browser):**
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pi-spi-sdk@0.2.0/dist/index.umd.js"></script>
+<script>
+  const payload = PISPIQrcode.buildPayloadString({
+    alias: '3497a720-ab11-4973-9619-534e04f263a1',
+    countryCode: 'CI',
+    qrType: 'STATIC',
+    referenceLabel: 'CAISSE_A01',
+    amount: 1500,
+  });
+</script>
+```
 
 ```typescript
 // Generate raw payload string

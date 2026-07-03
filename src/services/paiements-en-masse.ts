@@ -107,10 +107,9 @@ export class PaiementsEnMasseService extends BaseService {
       refDocType?: string;
       refDocNumero?: string;
     }>;
+    confirmation?: boolean;
   }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('POST', '/paiements-groupes', payment);
   }
 
   /**
@@ -135,9 +134,21 @@ export class PaiementsEnMasseService extends BaseService {
    * ```
    */
   async get(instructionId: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request(
+      'GET',
+      `/paiements-groupes/${encodeURIComponent(instructionId)}`
+    );
+  }
+
+  /**
+   * Confirm or retry a bulk payment
+   */
+  async confirm(instructionId: string, decision: boolean = true) {
+    return this.request(
+      'PUT',
+      `/paiements-groupes/${encodeURIComponent(instructionId)}/confirmations`,
+      { decision }
+    );
   }
 
   /**
@@ -161,8 +172,6 @@ export class PaiementsEnMasseService extends BaseService {
    * ```
    */
   async retry(instructionId: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.confirm(instructionId, true);
   }
 }

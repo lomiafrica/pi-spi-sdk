@@ -97,7 +97,7 @@ async newMethod(params: NewMethodParams): Promise<NewMethodResponse> {
 ## Structure
 
 ```
-apps/pi-spi-sdk/
+apps/sdks/pi-spi-sdk/
 ├── src/
 │   ├── services/          # Service wrapper classes
 │   ├── generated/         # Auto-generated (do not edit)

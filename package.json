@@ -1,15 +1,27 @@
 {
   "name": "pi-spi-sdk",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "TypeScript SDK for the π-SPI Business API. Built by lomi. for the West African fintech community",
-  "main": "./dist/index.js",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "browser": "./dist/index.umd.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./qrcode": {
+      "types": "./dist/qrcode/index.d.ts",
+      "import": "./dist/qrcode/index.mjs",
+      "require": "./dist/qrcode/index.cjs",
+      "default": "./dist/qrcode/index.mjs"
+    },
+    "./umd": {
+      "default": "./dist/index.umd.js"
     }
   },
   "files": [
@@ -20,10 +32,13 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup --config tsup.config.ts",
+    "dev": "tsup --config tsup.config.ts --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\" \"*.{json,md}\" \"scripts/**/*.{js,ts}\"",
-    "prepublish": "pnpm run generate && pnpm run build",
+    "prepublishOnly": "pnpm run generate && pnpm run build && pnpm run typecheck && pnpm test",
     "generate": "node scripts/pre-generate.js && openapi --input ./openapi.json --output ./src/generated --client axios --useOptions && node scripts/post-generate.js"
   },
   "keywords": [
@@ -79,6 +94,7 @@
     "@types/qrcode": "^1.5.6",
     "openapi-typescript-codegen": "^0.29.0",
     "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   }

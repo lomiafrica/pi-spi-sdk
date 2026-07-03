@@ -171,8 +171,31 @@ export class PaiementsService extends BaseService {
       statut?: string;
     }
   ) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', '/paiements', undefined, params);
+  }
+
+  /**
+   * Confirm a payment that was created with confirmation: true
+   */
+  async confirm(
+    txId: string,
+    decision: boolean,
+    body?: Record<string, unknown>
+  ) {
+    return this.request(
+      'PUT',
+      `/paiements/${encodeURIComponent(txId)}/confirmations`,
+      { decision, ...body }
+    );
+  }
+
+  /**
+   * Verify payment status by end-to-end ID
+   */
+  async verifyStatus(end2endId: string) {
+    return this.request(
+      'GET',
+      `/paiements/${encodeURIComponent(end2endId)}/statuts`
+    );
   }
 }

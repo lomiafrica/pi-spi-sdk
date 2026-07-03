@@ -21,7 +21,6 @@
  */
 
 import { BaseService } from './base';
-import { handleApiError } from '../error-handler';
 import type { QueryParams } from '../query-builder';
 
 // Import generated types and services
@@ -113,11 +112,7 @@ export class ComptesService extends BaseService {
       dateIrrevocabilite?: string;
     }
   ) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      // return await DefaultService.compteTransfertIntraLister(params);
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', '/comptes/transactions', undefined, params);
   }
 
   /**
@@ -173,12 +168,18 @@ export class ComptesService extends BaseService {
     motif?: string;
     txId?: string;
   }) {
-    return this.execute(async () => {
-      // This will call the generated service after codegen
-      // return await DefaultService.compteTransfertIntraCreer({
-      //   requestBody: transfer
-      // });
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
+    const txId =
+      transfer.txId ??
+      `TRF-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    return this.request('POST', '/comptes/transactions', {
+      txId,
+      comptePayeur: transfer.comptePayeur,
+      comptePaye: transfer.comptePaye,
+      payeurAlias: transfer.payeurAlias,
+      payeAlias: transfer.payeAlias,
+      montant: transfer.montant,
+      motif: transfer.motif,
     });
   }
 }

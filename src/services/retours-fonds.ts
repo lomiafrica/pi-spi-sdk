@@ -73,38 +73,37 @@ export class RetoursFondsService extends BaseService {
    * ```
    */
   async create(returnRequest: {
-    comptePaye: string;
-    txId: string;
-    montant: number;
-    motif: string;
+    comptePaye?: string;
+    txId?: string;
+    end2endId?: string;
+    montant?: number;
+    motif?: string;
   }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    const end2endId = returnRequest.end2endId ?? returnRequest.txId;
+    if (!end2endId) {
+      throw new Error('end2endId or txId is required for fund returns');
+    }
+
+    return this.request(
+      'PUT',
+      `/paiements/${encodeURIComponent(end2endId)}/retours`
+    );
   }
 
   /**
-   * Get fund return details by transaction ID
-   *
-   * @param id - Fund return transaction ID
-   * @returns Fund return details
-   * @throws {PiSpiNotFoundError} If return not found
+   * Get fund return details by end-to-end ID
    */
-  async get(id: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async get(end2endId: string) {
+    return this.request(
+      'GET',
+      `/paiements/${encodeURIComponent(end2endId)}/statuts`
+    );
   }
 
   /**
-   * List fund returns with filtering and pagination
-   *
-   * @param params - Query parameters for filtering and pagination
-   * @returns Paginated list of fund returns
+   * List payments with fund return status filter
    */
-  async list(params?: QueryParams) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async list(params?: QueryParams & { retourStatut?: string }) {
+    return this.request('GET', '/paiements', undefined, params);
   }
 }

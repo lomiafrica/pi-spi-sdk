@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-03
+
+### Added
+
+- Full PI-SPI Business API coverage: all service wrappers wired to real HTTP endpoints (no stubs)
+- Dual ESM (`.mjs`) + CommonJS (`.cjs`) build via `tsup`
+- QR-only UMD browser bundle (`pi-spi-sdk/umd`, global `PISPIQrcode`) for CDN usage
+- `./qrcode` subpath export for lightweight QR-only imports
+- `paiements.confirm`, `paiements.verifyStatus`, `demandesPaiement.confirm`, `demandesAnnulation.respond`
+- Vitest coverage for QR validation, finder patterns, HTTP layer, and customer QR helpers
+
+### Changed
+
+- QR module aligned with official `@pi-spi/qrcode@1.0.0`: optional Tag 05, rectangle finder patterns
+- `default` export on QR module for drop-in compatibility with `@pi-spi/qrcode`
+
 ## [0.1.5] - 2026-06-27
 
 ### Added

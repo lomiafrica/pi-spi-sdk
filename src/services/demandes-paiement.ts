@@ -120,9 +120,7 @@ export class DemandesPaiementService extends BaseService {
    * @returns Paginated list of payment requests
    */
   async list(params?: QueryParams) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request('GET', '/demandes-paiements', undefined, params);
   }
 
   /**
@@ -155,9 +153,11 @@ export class DemandesPaiementService extends BaseService {
    * @returns Payment confirmation response
    */
   async accept(id: string, immediate: boolean = true) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request(
+      'POST',
+      `/demandes-paiements/${encodeURIComponent(id)}/reponses`,
+      { decision: true, paiementImmediat: immediate }
+    );
   }
 
   /**
@@ -171,8 +171,21 @@ export class DemandesPaiementService extends BaseService {
    * @returns Rejection confirmation response
    */
   async reject(id: string, reason?: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+    return this.request(
+      'POST',
+      `/demandes-paiements/${encodeURIComponent(id)}/reponses`,
+      { decision: false, ...(reason ? { raison: reason } : {}) }
+    );
+  }
+
+  /**
+   * Confirm sending a payment request created with confirmation: true
+   */
+  async confirm(txId: string, decision: boolean) {
+    return this.request(
+      'PUT',
+      `/demandes-paiements/${encodeURIComponent(txId)}/confirmations`,
+      { decision }
+    );
   }
 }

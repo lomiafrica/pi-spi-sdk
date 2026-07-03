@@ -76,34 +76,49 @@ export class DemandesAnnulationService extends BaseService {
    * });
    * ```
    */
-  async create(request: { comptePayeur: string; txId: string; motif: string }) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async create(request: {
+    comptePayeur?: string;
+    txId?: string;
+    end2endId?: string;
+    motif: string;
+  }) {
+    const end2endId = request.end2endId ?? request.txId;
+    if (!end2endId) {
+      throw new Error('end2endId or txId is required for cancellation requests');
+    }
+
+    return this.request(
+      'POST',
+      `/paiements/${encodeURIComponent(end2endId)}/annulations`,
+      { raison: request.motif }
+    );
   }
 
   /**
-   * Get cancellation request details by transaction ID
-   *
-   * @param id - Cancellation request transaction ID
-   * @returns Cancellation request details
-   * @throws {PiSpiNotFoundError} If cancellation request not found
+   * Get cancellation request details by end-to-end ID
    */
-  async get(id: string) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async get(end2endId: string) {
+    return this.request(
+      'GET',
+      `/paiements/${encodeURIComponent(end2endId)}/statuts`
+    );
   }
 
   /**
-   * List cancellation requests with filtering and pagination
-   *
-   * @param params - Query parameters for filtering and pagination
-   * @returns Paginated list of cancellation requests
+   * List payments with cancellation status filter
    */
-  async list(params?: QueryParams) {
-    return this.execute(async () => {
-      throw new Error('Service not yet generated. Run "pnpm run generate" first.');
-    });
+  async list(params?: QueryParams & { annulationStatut?: string }) {
+    return this.request('GET', '/paiements', undefined, params);
+  }
+
+  /**
+   * Respond to a cancellation request (accept or reject)
+   */
+  async respond(end2endId: string, decision: boolean) {
+    return this.request(
+      'PUT',
+      `/paiements/${encodeURIComponent(end2endId)}/annulations/reponses`,
+      { decision }
+    );
   }
 }
