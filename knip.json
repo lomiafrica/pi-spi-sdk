@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/index.ts", "src/**/*.spec.ts"],
+  "project": ["src/**/*.ts"],
+  "ignore": ["src/generated/**", "src/examples.ts"],
+  "ignoreDependencies": ["dotenv", "@types/form-data"],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off",
+    "duplicates": "off"
+  }
+}
