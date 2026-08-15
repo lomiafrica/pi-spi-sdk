@@ -22,10 +22,13 @@ describe('BaseService.request', () => {
     const result = await service.get('wh-1');
 
     expect(fetchMock).toHaveBeenCalledOnce();
-    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://sandbox.api.pi-bceao.com/piz/v1/webhooks/wh-1');
-    expect((options.headers as Record<string, string>).Authorization).toBe(
-      'Bearer test-token'
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://sandbox.api.pi-bceao.com/piz/v1/webhooks/wh-1',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+        }),
+      }),
     );
     expect(result).toEqual({ id: 'wh-1', callbackUrl: 'https://example.com/hook' });
   });
@@ -45,8 +48,8 @@ describe('BaseService.request', () => {
     });
 
     await expect(service.list()).rejects.toMatchObject({
-      status: 401,
-      title: 'Unauthorized',
+      statusCode: 401,
+      message: 'Unauthorized',
     });
   });
 });

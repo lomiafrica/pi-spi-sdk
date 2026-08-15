@@ -2,13 +2,28 @@
  * Base service class with common error handling and HTTP request capability
  */
 
-import { handleApiError } from '../error-handler';
+import {
+  GeneratedApiError,
+  handleApiError,
+  parseGeneratedErrorBody,
+} from '../error-handler';
+import type { JsonValue } from "@lomi./shared";
+
+export interface ApiHeaders {
+  [name: string]: string;
+}
+
+export interface RequestBody {}
+
+export interface RequestParams {
+  [name: string]: string | number | boolean | null | undefined;
+}
 
 export interface ApiConfig {
   BASE: string;
   TOKEN?: string;
-  HEADERS?: Record<string, string>;
-  dispatcher?: unknown;
+  HEADERS?: ApiHeaders;
+  dispatcher?: RequestInit['dispatcher'];
 }
 
 export abstract class BaseService {
@@ -25,14 +40,21 @@ export abstract class BaseService {
     try {
       return await operation();
     } catch (error) {
-      throw handleApiError(error);
+      throw handleApiError(
+        error instanceof Error ? error : new Error('Unexpected request error'),
+      );
     }
   }
 
   /**
    * Make an HTTP request
    */
-  protected async request<T>(method: string, path: string, body?: any, params?: Record<string, any>): Promise<T> {
+  protected async request<T>(
+    method: string,
+    path: string,
+    body?: RequestBody,
+    params?: RequestParams,
+  ): Promise<T> {
     return this.execute(async () => {
       const url = new URL(`${this.config.BASE}${path}`);
       
@@ -44,7 +66,7 @@ export abstract class BaseService {
         });
       }
 
-      const headers: Record<string, string> = {
+      const headers: ApiHeaders = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         ...this.config.HEADERS,
@@ -54,7 +76,7 @@ export abstract class BaseService {
         headers['Authorization'] = `Bearer ${this.config.TOKEN}`;
       }
 
-      const fetchOptions: Record<string, unknown> = {
+      const fetchOptions: RequestInit = {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
@@ -64,31 +86,32 @@ export abstract class BaseService {
         fetchOptions.dispatcher = this.config.dispatcher;
       }
 
-      const response = await fetch(url.toString(), fetchOptions as RequestInit);
+      const response = await fetch(url.toString(), fetchOptions);
 
       if (!response.ok) {
         // Try to parse error body
-        let errorBody: Record<string, unknown>;
+        let errorBody;
         try {
-          const parsed = (await response.json()) as Record<string, unknown>;
-          errorBody = {
-            ...parsed,
-            status: response.status,
-            statusText: response.statusText,
-          };
+          // SAFETY: response.json is the HTTP boundary; the parser validates fields.
+          const parsedBody = (await response.json()) as JsonValue;
+          errorBody = parseGeneratedErrorBody(parsedBody);
         } catch {
-          errorBody = {
-            status: response.status,
-            statusText: response.statusText,
-          };
+          errorBody = {};
         }
-        throw errorBody; // Will be caught by execute/handleApiError
+        throw new GeneratedApiError(
+          url.toString(),
+          response.status,
+          response.statusText,
+          errorBody,
+        );
       }
 
       if (response.status === 204) {
+        // SAFETY: Callers requesting an empty response bind T to their endpoint type.
         return {} as T;
       }
 
+      // SAFETY: Service methods bind T to the documented endpoint response schema.
       return (await response.json()) as T;
     });
   }

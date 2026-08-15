@@ -37,6 +37,12 @@ export class QueryBuilder {
    * @param operator - Filter operator (default: 'eq')
    * @param value - Filter value
    */
+  filter(field: string, value: string | number | boolean): this;
+  filter(
+    field: string,
+    operator: FilterOperator,
+    value: string | number | boolean | string[]
+  ): this;
   filter(
     field: string,
     operatorOrValue: FilterOperator | string | number | boolean,
@@ -47,13 +53,16 @@ export class QueryBuilder {
 
     if (value === undefined) {
       // If only two arguments, treat first as operator/value
-      if (typeof operatorOrValue === 'string' && this.isOperator(operatorOrValue)) {
+      if (this.isOperator(operatorOrValue)) {
         throw new Error('Filter operator requires a value');
       }
       operator = 'eq';
-      filterValue = operatorOrValue as string | number | boolean;
+      filterValue = operatorOrValue;
     } else {
-      operator = operatorOrValue as FilterOperator;
+      if (!this.isOperator(operatorOrValue)) {
+        throw new Error(`Invalid filter operator: ${String(operatorOrValue)}`);
+      }
+      operator = operatorOrValue;
       filterValue = value;
     }
 
@@ -139,7 +148,7 @@ export class QueryBuilder {
    * Set page number
    */
   page(page: number | string): this {
-    this.params.page = typeof page === 'string' ? page : page.toString();
+    this.params.page = String(page);
     return this;
   }
 
@@ -215,7 +224,10 @@ export class QueryBuilder {
     return this;
   }
 
-  private isOperator(value: string): boolean {
+  private isOperator(
+    value: FilterOperator | string | number | boolean,
+  ): value is FilterOperator {
+    if (typeof value !== 'string') return false;
     return [
       'eq',
       'ne',

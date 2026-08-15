@@ -2,37 +2,73 @@
  * Error handler utility for converting API errors to SDK errors
  */
 
-// ApiError will be available after code generation
-// The structure matches openapi-typescript-codegen's ApiError class
-interface GeneratedApiError extends Error {
-  url: string;
-  status: number;
-  statusText: string;
-  body: any;
-  request: any;
-}
 import {
   PiSpiError,
   PiSpiValidationError,
   PiSpiAuthError,
   PiSpiNotFoundError,
   PiSpiRateLimitError,
+  type ValidationErrors,
 } from './errors';
+import {
+  isJsonObject,
+  isString,
+  readString,
+  type JsonValue,
+} from "@lomi./shared";
+
+export interface GeneratedErrorBody {
+  type?: string;
+  title?: string;
+  detail?: string;
+  instance?: string;
+  invalidParams?: ValidationErrors;
+  errors?: ValidationErrors;
+}
+
+export class GeneratedApiError extends Error {
+  constructor(
+    public readonly url: string,
+    public readonly status: number,
+    public readonly statusText: string,
+    public readonly body: GeneratedErrorBody,
+  ) {
+    super(body.detail ?? body.title ?? statusText);
+    this.name = 'GeneratedApiError';
+  }
+}
+
+export function parseGeneratedErrorBody(value: JsonValue): GeneratedErrorBody {
+  if (!isJsonObject(value)) return {};
+  return {
+    type: readString(value, 'type'),
+    title: readString(value, 'title'),
+    detail: readString(value, 'detail'),
+    instance: readString(value, 'instance'),
+    invalidParams: readValidationErrors(value['invalidParams']),
+    errors: readValidationErrors(value['errors']),
+  };
+}
+
+function readValidationErrors(
+  value: JsonValue | undefined,
+): ValidationErrors | undefined {
+  if (value === undefined || !isJsonObject(value)) return undefined;
+  const result: ValidationErrors = {};
+  for (const [field, messages] of Object.entries(value)) {
+    if (Array.isArray(messages) && messages.every(isString)) {
+      result[field] = messages;
+    }
+  }
+  return result;
+}
 
 /**
  * Convert a generated API error to a SDK error
  */
-export function handleApiError(error: unknown): never {
-  // Check if it's an ApiError-like object (from generated code)
-  const isApiError =
-    error &&
-    typeof error === 'object' &&
-    'status' in error &&
-    'statusText' in error &&
-    'body' in error;
-
-  if (isApiError) {
-    const apiError = error as GeneratedApiError;
+export function handleApiError(error: Error): never {
+  if (error instanceof GeneratedApiError) {
+    const apiError = error;
     const status = apiError.status;
     const body = apiError.body;
 

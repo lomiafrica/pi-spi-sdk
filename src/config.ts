@@ -17,7 +17,7 @@ export interface PiSpiConfig {
   /**
    * Optional: undici/fetch dispatcher (e.g. mTLS Agent)
    */
-  dispatcher?: unknown;
+  dispatcher?: RequestInit['dispatcher'];
 
   /**
    * Optional: Client certificate path for mTLS

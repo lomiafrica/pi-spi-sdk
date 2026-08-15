@@ -78,19 +78,19 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
  * @returns Country code or null
  */
 export function getCountryFromAccount(accountNumber: string): string | null {
-  const countryMap: Record<string, string> = {
-    CI: "Côte d'Ivoire",
-    SN: 'Senegal',
-    BJ: 'Benin',
-    BF: 'Burkina Faso',
-    ML: 'Mali',
-    NE: 'Niger',
-    TG: 'Togo',
-    GW: 'Guinea-Bissau',
-  };
+  const countryMap = new Map([
+    ['CI', "Côte d'Ivoire"],
+    ['SN', 'Senegal'],
+    ['BJ', 'Benin'],
+    ['BF', 'Burkina Faso'],
+    ['ML', 'Mali'],
+    ['NE', 'Niger'],
+    ['TG', 'Togo'],
+    ['GW', 'Guinea-Bissau'],
+  ]);
 
   const countryCode = accountNumber.substring(0, 2);
-  return countryMap[countryCode] || null;
+  return countryMap.get(countryCode) || null;
 }
 
 /**

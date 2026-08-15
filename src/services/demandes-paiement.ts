@@ -153,11 +153,10 @@ export class DemandesPaiementService extends BaseService {
    * @returns Payment confirmation response
    */
   async accept(id: string, immediate: boolean = true) {
-    return this.request(
-      'POST',
-      `/demandes-paiements/${encodeURIComponent(id)}/reponses`,
-      { decision: true, paiementImmediat: immediate }
-    );
+    return this.request('POST', `/demandes-paiements/${encodeURIComponent(id)}/reponses`, {
+      decision: true,
+      paiementImmediat: immediate,
+    });
   }
 
   /**
@@ -174,7 +173,7 @@ export class DemandesPaiementService extends BaseService {
     return this.request(
       'POST',
       `/demandes-paiements/${encodeURIComponent(id)}/reponses`,
-      { decision: false, ...(reason ? { raison: reason } : {}) }
+      Object.assign({}, { decision: false }, reason ? { raison: reason } : {})
     );
   }
 
@@ -182,10 +181,8 @@ export class DemandesPaiementService extends BaseService {
    * Confirm sending a payment request created with confirmation: true
    */
   async confirm(txId: string, decision: boolean) {
-    return this.request(
-      'PUT',
-      `/demandes-paiements/${encodeURIComponent(txId)}/confirmations`,
-      { decision }
-    );
+    return this.request('PUT', `/demandes-paiements/${encodeURIComponent(txId)}/confirmations`, {
+      decision,
+    });
   }
 }

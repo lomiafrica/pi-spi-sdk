@@ -1,3 +1,7 @@
+export interface ValidationErrors {
+  [field: string]: string[];
+}
+
 /**
  * Custom error classes for PI-SPI SDK
  */
@@ -28,13 +32,13 @@ export class PiSpiError extends Error {
 }
 
 export class PiSpiValidationError extends PiSpiError {
-  public readonly errors?: Record<string, string[]>;
+  public readonly errors?: ValidationErrors;
 
   constructor(
     message: string,
     statusCode: number,
     statusText: string,
-    errors?: Record<string, string[]>,
+    errors?: ValidationErrors,
     type?: string,
     detail?: string
   ) {

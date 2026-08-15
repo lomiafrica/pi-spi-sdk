@@ -61,7 +61,7 @@ export const ALIAS_TYPES = [AliasType.SHID, AliasType.MCOD, AliasType.MBNO] as c
  * Check if a string is a valid alias type
  */
 export function isValidAliasType(value: string): value is AliasType {
-  return ALIAS_TYPES.includes(value as AliasType);
+  return ALIAS_TYPES.some((aliasType) => aliasType === value);
 }
 
 /**

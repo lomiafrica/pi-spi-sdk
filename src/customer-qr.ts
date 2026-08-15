@@ -1,3 +1,9 @@
+import {
+  isJsonObject,
+  isString,
+  type JsonValue,
+} from "@lomi./shared";
+
 export type LomiCustomerAliasType = 'SHID' | 'MBNO' | 'MCOD';
 
 export type LomiCustomerQr = {
@@ -41,32 +47,28 @@ export function parseLomiCustomerQr(raw: string): LomiCustomerQr | null {
     return null;
   }
 
-  let parsed: unknown;
+  let parsed: JsonValue;
   try {
     parsed = JSON.parse(trimmed);
   } catch {
     return null;
   }
 
-  if (typeof parsed !== 'object' || parsed === null) {
+  if (!isJsonObject(parsed)) {
     return null;
   }
 
-  const record = parsed as Record<string, unknown>;
-  if (record.t !== 'lomi.cust' || record.v !== 1) {
+  if (parsed['t'] !== 'lomi.cust' || parsed['v'] !== 1) {
     return null;
   }
 
-  const alias = record.alias;
-  if (typeof alias !== 'string' || alias.trim().length === 0) {
+  const alias = parsed['alias'];
+  if (!isString(alias) || alias.trim().length === 0) {
     return null;
   }
 
-  const aliasType = record.aliasType;
-  if (
-    typeof aliasType !== 'string' ||
-    !ALIAS_TYPES.includes(aliasType as LomiCustomerAliasType)
-  ) {
+  const aliasType = parsed['aliasType'];
+  if (!isAliasType(aliasType)) {
     return null;
   }
 
@@ -74,6 +76,12 @@ export function parseLomiCustomerQr(raw: string): LomiCustomerQr | null {
     t: 'lomi.cust',
     v: 1,
     alias: alias.trim(),
-    aliasType: aliasType as LomiCustomerAliasType,
+    aliasType,
   };
+}
+
+function isAliasType(
+  value: JsonValue | undefined,
+): value is LomiCustomerAliasType {
+  return isString(value) && ALIAS_TYPES.some((aliasType) => aliasType === value);
 }

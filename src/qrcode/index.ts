@@ -11,6 +11,14 @@ export interface QrPayloadInput {
     amount?: number | string;
 }
 
+export interface QrPayloadBoundaryInput {
+    alias?: string;
+    countryCode?: string;
+    qrType?: string;
+    referenceLabel?: string;
+    amount?: number | string;
+}
+
 export interface AdditionalDataOverrides {
     merchantChannel?: string;
     purposeOfTransaction?: string;
@@ -38,6 +46,30 @@ export interface QrValidationResult {
     data?: QrPayloadInput;
 }
 
+interface QrMatrix {
+    size?: number;
+    length?: number;
+    data?: ArrayLike<boolean | number>;
+    get?: (row: number, col: number) => boolean | number;
+    [row: number]: ArrayLike<boolean | number> | undefined;
+}
+
+interface QrCodeInstance {
+    modules: QrMatrix;
+}
+
+export interface QrCodeFactory {
+    create: (
+        payload: string,
+        options: { errorCorrectionLevel: 'M' }
+    ) => QrCodeInstance;
+}
+
+export interface QRCodeModuleCandidate {
+    create?: QrCodeFactory['create'];
+    default?: QrCodeFactory;
+}
+
 export interface QrCodeSvgOptions {
     size?: number;
     margin?: number;
@@ -48,32 +80,55 @@ export interface QrCodeSvgOptions {
     logoBorderRadiusRatio?: number;
     dotColor?: string;
     backgroundColor?: string;
+    /**
+     * Inject a QR create function (tests / custom backends).
+     * When omitted, the `qrcode` package (or browser global) is used.
+     */
+    createQr?: QrCodeFactory['create'];
 }
 
-type QRCodeModule = typeof import('qrcode');
+interface StringFields {
+    [key: string]: string;
+}
 
-let cachedQrCodeModule: QRCodeModule | null = null;
+interface BrowserGlobal {
+    window?: {
+        QRCode?: QrCodeFactory;
+    };
+}
 
-function resolveQrCodeModule(module: any): QRCodeModule {
-    if (module?.create) {
-        return module;
+declare global {
+    interface Window {
+        QRCode?: QrCodeFactory;
     }
-    if (module?.default?.create) {
+}
+
+let cachedQrCodeModule: QrCodeFactory | null = null;
+
+export function resolveQrCodeModule(module: QRCodeModuleCandidate): QrCodeFactory {
+    if (module.create instanceof Function) {
+        return { create: module.create };
+    }
+    if (module.default?.create instanceof Function) {
         return module.default;
     }
     throw new Error('Le module "qrcode" n\'expose pas l\'API attendue.');
 }
 
-async function getQrCodeModule(): Promise<QRCodeModule> {
+/** Test seam: pin or clear the cached qrcode factory. Pass `null` to reset. */
+export function setQrCodeFactoryForTests(factory: QrCodeFactory | null): void {
+    cachedQrCodeModule = factory;
+}
+
+async function getQrCodeModule(): Promise<QrCodeFactory> {
     if (cachedQrCodeModule) {
         return cachedQrCodeModule;
     }
 
     // Dans le navigateur, utiliser QRCode global si disponible (depuis qrcode/build/qrcode.min.js)
-    // @ts-ignore
-    if (typeof window !== 'undefined' && window.QRCode) {
-        // @ts-ignore
-        const resolved = resolveQrCodeModule(window.QRCode);
+    const runtime: BrowserGlobal = globalThis;
+    if (runtime.window?.QRCode) {
+        const resolved = resolveQrCodeModule(runtime.window.QRCode);
         cachedQrCodeModule = resolved;
         return resolved;
     }
@@ -105,7 +160,7 @@ const FINDER_CORNER_RADIUS = 0.8;
  * Génère la payload EMV conforme PI-SPI pour un QR Code.
  */
 export function createQrPayload(
-    input: QrPayloadInput,
+    input: QrPayloadBoundaryInput,
     options: QrPayloadOptions = {}
 ): QrPayloadResult {
     const {
@@ -233,7 +288,7 @@ function formatDataObject(id: string, value: string): string {
 }
 
 function sanitizeAmount(value: string | number): string {
-    return typeof value === 'number' ? value.toString() : value.trim();
+    return isNumber(value) ? value.toString() : value.trim();
 }
 
 function validateSubTag(tag: string): void {
@@ -274,13 +329,17 @@ function validateCountryCode(code: string): void {
 }
 
 function validateAmount(amount: string | number): void {
-    const normalized = typeof amount === 'number' ? amount.toString() : amount.trim();
+    const normalized = isNumber(amount) ? amount.toString() : amount.trim();
     if (!/^\d+$/.test(normalized)) {
         throw new Error('Le montant doit contenir uniquement des chiffres.');
     }
     if (normalized.length > 13) {
         throw new Error('Le montant ne doit pas dépasser 13 chiffres.');
     }
+}
+
+function isNumber(value: string | number): value is number {
+    return typeof value === 'number';
 }
 
 export function computeCrc16(input: string): string {
@@ -310,8 +369,9 @@ export async function generateQrCodeSvg(
     const { payload } = createQrPayload(input);
     const size = options.size ?? DEFAULT_SVG_SIZE;
     const margin = options.margin ?? DEFAULT_MARGIN;
-    const module = await getQrCodeModule();
-    const qr = module.create(payload, {
+    const create =
+        options.createQr ?? (await getQrCodeModule()).create;
+    const qr = create(payload, {
         errorCorrectionLevel: 'M',
     });
 
@@ -390,10 +450,31 @@ export function isValidPispiQrPayload(value: string): QrValidationResult {
 
 interface SegmentValidationResult {
     errors: string[];
-    merchantInfo: Record<string, string> | null;
+    merchantInfo: StringFields | null;
     referenceLabel?: string;
     merchantChannel?: string;
     countryCode?: string;
+}
+
+interface ParsedEmvSegments {
+    segments: StringFields;
+    errors: string[];
+}
+
+interface MerchantInfoResult {
+    merchantInfo: StringFields | null;
+    errors: string[];
+}
+
+interface CountryCodeResult {
+    countryCode?: string;
+    errors: string[];
+}
+
+interface AdditionalDataResult {
+    referenceLabel?: string;
+    merchantChannel?: string;
+    errors: string[];
 }
 
 function validatePayloadBasics(value: string): string[] {
@@ -408,8 +489,8 @@ function validatePayloadBasics(value: string): string[] {
     return [];
 }
 
-function parseEmvSegments(value: string): { segments: Record<string, string>; errors: string[] } {
-    const segments: Record<string, string> = {};
+function parseEmvSegments(value: string): ParsedEmvSegments {
+    const segments: StringFields = {};
     const errors: string[] = [];
     let cursor = 0;
 
@@ -483,10 +564,7 @@ function validateFormatIndicator(formatIndicator: string | undefined): string[] 
     return [];
 }
 
-function extractMerchantInfo(segment: string | undefined): {
-    merchantInfo: Record<string, string> | null;
-    errors: string[];
-} {
+function extractMerchantInfo(segment: string | undefined): MerchantInfoResult {
     if (!segment) {
         return {
             merchantInfo: null,
@@ -511,10 +589,7 @@ function extractMerchantInfo(segment: string | undefined): {
     }
 }
 
-function validateCountryCodeSegment(countryCode: string | undefined): {
-    countryCode?: string;
-    errors: string[];
-} {
+function validateCountryCodeSegment(countryCode: string | undefined): CountryCodeResult {
     if (!countryCode) {
         return {
             errors: ['Tag 58 (Country Code) manquant.'],
@@ -527,11 +602,7 @@ function validateCountryCodeSegment(countryCode: string | undefined): {
     };
 }
 
-function extractAdditionalData(segment: string | undefined): {
-    referenceLabel?: string;
-    merchantChannel?: string;
-    errors: string[];
-} {
+function extractAdditionalData(segment: string | undefined): AdditionalDataResult {
     if (!segment) {
         return {
             errors: ['Tag 62 (Additional Data Field) manquant.'],
@@ -578,7 +649,7 @@ function validateCrcSegment(crc: string | undefined, rawValue: string): string[]
 }
 
 function buildValidationData(
-    segments: Record<string, string>,
+    segments: StringFields,
     context: SegmentValidationResult
 ): QrPayloadInput {
     const amountValue = segments['54'];
@@ -596,8 +667,8 @@ function buildValidationData(
     return data;
 }
 
-function parseSubFields(data: string): Record<string, string> {
-    const segments: Record<string, string> = {};
+function parseSubFields(data: string): StringFields {
+    const segments: StringFields = {};
     let cursor = 0;
 
     while (cursor < data.length) {
@@ -624,7 +695,7 @@ function parseSubFields(data: string): Record<string, string> {
 }
 
 function buildDotPatternSvg(
-    qr: { modules: any },
+    qr: QrCodeInstance,
     options: {
         size: number;
         margin: number;
@@ -640,9 +711,8 @@ function buildDotPatternSvg(
     }
 ): string {
     const modules = qr.modules;
-    const moduleCount: number = typeof modules?.size === 'number' ? modules.size : modules.length;
-
-    if (typeof moduleCount !== 'number' || Number.isNaN(moduleCount)) {
+    const moduleCount = readModuleCount(modules);
+    if (moduleCount === null) {
         throw new TypeError('Format du QR Code inattendu: impossible de déterminer la taille de la matrice.');
     }
 
@@ -713,6 +783,12 @@ function buildDotPatternSvg(
         logoSvg,
         '</svg>',
     ].join('');
+}
+
+function readModuleCount(modules: QrMatrix): number | null {
+    if (Number.isFinite(modules.size)) return Number(modules.size);
+    if (Number.isFinite(modules.length)) return Number(modules.length);
+    return null;
 }
 
 function isFinderPattern(moduleCount: number, row: number, col: number): boolean {
@@ -789,18 +865,24 @@ function generateLogoOverlay(
     ].join('');
 }
 
-function isDarkModule(modules: any, moduleCount: number, row: number, col: number): boolean {
-    if (modules?.data && Array.isArray(modules.data)) {
+function isDarkModule(
+    modules: QrMatrix,
+    moduleCount: number,
+    row: number,
+    col: number
+): boolean {
+    if (modules.data) {
         const index = row * moduleCount + col;
         return Boolean(modules.data[index]);
     }
 
-    if (typeof modules?.get === 'function') {
+    if (modules.get) {
         return Boolean(modules.get(row, col));
     }
 
-    if (Array.isArray(modules[row])) {
-        return Boolean(modules[row][col]);
+    const matrixRow = modules[row];
+    if (matrixRow) {
+        return Boolean(matrixRow[col]);
     }
 
     return false;

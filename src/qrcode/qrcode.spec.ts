@@ -5,11 +5,14 @@ import {
     isValidPispiQrPayload,
     buildPayloadString,
     generateQrCodeSvg,
+    resolveQrCodeModule,
+    setQrCodeFactoryForTests,
     DEFAULT_PISPI_LOGO_DATA_URL,
-    QrType,
 } from './index';
 
-type SegmentMap = Record<string, string>;
+interface SegmentMap {
+    [tag: string]: string;
+}
 
 type SegmentEntry = {
     tag: string;
@@ -231,7 +234,7 @@ describe('createQrPayload', () => {
             createQrPayload({
                 alias: BASE_ALIAS,
                 countryCode: BASE_COUNTRY,
-                qrType: 'UNKNOWN' as QrType,
+                qrType: 'UNKNOWN',
                 referenceLabel: REFERENCE_CAISSE,
             })
         ).toThrow('Le paramètre "qrType" doit être "STATIC" ou "DYNAMIC".');
@@ -295,7 +298,7 @@ describe('createQrPayload', () => {
                 countryCode: BASE_COUNTRY,
                 qrType: undefined,
                 referenceLabel: REFERENCE_CAISSE,
-            } as unknown as any)
+            })
         ).toThrow('Le paramètre "qrType" est obligatoire.');
     });
 
@@ -306,7 +309,7 @@ describe('createQrPayload', () => {
                 countryCode: BASE_COUNTRY,
                 qrType: 'STATIC',
                 referenceLabel: '',
-            } as unknown as any)
+            })
         ).toThrow('Le paramètre "referenceLabel" est obligatoire.');
     });
 
@@ -317,7 +320,7 @@ describe('createQrPayload', () => {
                 countryCode: BASE_COUNTRY,
                 qrType: 'STATIC',
                 referenceLabel: REFERENCE_CAISSE,
-            } as unknown as any)
+            })
         ).toThrow('Le paramètre "alias" est obligatoire.');
     });
 
@@ -328,7 +331,7 @@ describe('createQrPayload', () => {
                 countryCode: '',
                 qrType: 'STATIC',
                 referenceLabel: REFERENCE_CAISSE,
-            } as unknown as any)
+            })
         ).toThrow('Le paramètre "countryCode" est obligatoire.');
     });
 });
@@ -668,8 +671,7 @@ describe('generateQrCodeSvg', () => {
 
 describe('generateQrCodeSvg mocked matrices', () => {
     afterEach(() => {
-        vi.resetModules();
-        vi.doUnmock('qrcode');
+        setQrCodeFactoryForTests(null);
     });
 
     const input = {
@@ -680,86 +682,70 @@ describe('generateQrCodeSvg mocked matrices', () => {
     };
 
     it('lève un TypeError lorsque la matrice est invalide', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({ modules: {} }),
-        }));
-
-        const module = await import('./index');
-        await expect(module.generateQrCodeSvg(input)).rejects.toBeInstanceOf(TypeError);
+        await expect(
+            generateQrCodeSvg(input, {
+                createQr: () => ({ modules: {} }),
+            })
+        ).rejects.toBeInstanceOf(TypeError);
     });
 
     it('génère un SVG avec une matrice basée sur get()', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({
+        const svg = await generateQrCodeSvg(input, {
+            logoDataUrl: '',
+            createQr: () => ({
                 modules: {
                     size: 2,
                     get: (row: number, col: number) => row === col,
                 },
             }),
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
+        });
         expect(svg).toContain('<svg');
         expect(svg).toContain('<rect');
     });
 
     it('génère un SVG avec une matrice sous forme de tableau', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({
+        const svg = await generateQrCodeSvg(input, {
+            logoDataUrl: '',
+            createQr: () => ({
                 modules: [
                     [1, 0],
                     [0, 1],
                 ],
             }),
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
+        });
         expect(svg).toContain('<svg');
         expect(svg).toContain('<rect');
     });
 
     it('génère un SVG avec une matrice à données linéaires', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({
+        const svg = await generateQrCodeSvg(input, {
+            logoDataUrl: '',
+            createQr: () => ({
                 modules: {
                     size: 2,
                     data: [1, 0, 0, 1],
                 },
             }),
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
+        });
         expect(svg).toContain('<svg');
         expect(svg).toContain('<rect');
     });
 
     it('ignore les modules non reconnus', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({
+        const svg = await generateQrCodeSvg(input, {
+            logoDataUrl: '',
+            createQr: () => ({
                 modules: {
                     size: 1,
                 },
             }),
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
+        });
         expect(svg).toContain('<svg');
     });
 
-    it('accepte un module exporté via default', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
+    it('accepte un module exporté via default', () => {
+        const resolved = resolveQrCodeModule({
             create: undefined,
-            __esModule: true,
             default: {
                 create: () => ({
                     modules: {
@@ -768,40 +754,34 @@ describe('generateQrCodeSvg mocked matrices', () => {
                     },
                 }),
             },
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '' });
-        expect(svg).toContain('<svg');
+        });
+        expect(resolved.create).toBeInstanceOf(Function);
+        expect(resolved.create('x', { errorCorrectionLevel: 'M' }).modules).toEqual({
+            size: 1,
+            data: [1],
+        });
     });
 
-    it('lève une erreur si le module qrcode est invalide', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            __esModule: true,
-            create: undefined,
-            default: {},
-        }));
-
-        const module = await import('./index');
-        await expect(module.generateQrCodeSvg(input)).rejects.toThrow(
-            'Le module "qrcode" n\'expose pas l\'API attendue.'
-        );
+    it('lève une erreur si le module qrcode est invalide', () => {
+        expect(() =>
+            resolveQrCodeModule({
+                create: undefined,
+                default: {},
+            })
+        ).toThrow('Le module "qrcode" n\'expose pas l\'API attendue.');
     });
 
     it('utilise des rectangles pour les finder patterns', async () => {
-        vi.resetModules();
-        vi.doMock('qrcode', () => ({
-            create: () => ({
+        const svg = await generateQrCodeSvg(input, {
+            logoDataUrl: '',
+            size: 210,
+            createQr: () => ({
                 modules: {
                     size: 21,
                     data: Array.from({ length: 21 * 21 }, (_, i) => (i % 3 === 0 ? 1 : 0)),
                 },
             }),
-        }));
-
-        const module = await import('./index');
-        const svg = await module.generateQrCodeSvg(input, { logoDataUrl: '', size: 210 });
+        });
         expect(svg).toContain('<rect');
         expect(svg.match(/<rect/g)?.length).toBeGreaterThan(3);
     });

@@ -14,6 +14,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const specPath = join(__dirname, '../openapi.json');
+const isObjectRecord = (value) =>
+  value !== null && Object(value) === value && !Array.isArray(value);
 
 try {
   console.log('📋 Validating OpenAPI specification...');
@@ -29,11 +31,11 @@ try {
     throw new Error('Missing "info" field');
   }
 
-  if (!spec.paths || typeof spec.paths !== 'object') {
+  if (!isObjectRecord(spec.paths)) {
     throw new Error('Missing or invalid "paths" field');
   }
 
-  if (!spec.components || typeof spec.components !== 'object') {
+  if (!isObjectRecord(spec.components)) {
     throw new Error('Missing or invalid "components" field');
   }
 
@@ -49,7 +51,7 @@ try {
   const httpMethods = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'];
 
   for (const [path, pathItem] of Object.entries(spec.paths)) {
-    if (pathItem && typeof pathItem === 'object') {
+    if (isObjectRecord(pathItem)) {
       for (const [key, value] of Object.entries(pathItem)) {
         // Check if this is an HTTP method
         if (httpMethods.includes(key.toLowerCase())) {
@@ -62,7 +64,7 @@ try {
           }
 
           // Ensure the operation object exists and has tags
-          if (typeof value !== 'object') {
+          if (!isObjectRecord(value)) {
             console.log(`⚠️  Skipping invalid operation ${key.toUpperCase()} ${path}`);
             continue;
           }

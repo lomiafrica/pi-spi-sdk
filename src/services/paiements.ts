@@ -25,6 +25,7 @@
 
 import { BaseService } from './base';
 import type { QueryParams } from '../query-builder';
+import type { JsonObject } from "@lomi./shared";
 
 export class PaiementsService extends BaseService {
   /**
@@ -180,7 +181,7 @@ export class PaiementsService extends BaseService {
   async confirm(
     txId: string,
     decision: boolean,
-    body?: Record<string, unknown>
+    body?: JsonObject
   ) {
     return this.request(
       'PUT',
