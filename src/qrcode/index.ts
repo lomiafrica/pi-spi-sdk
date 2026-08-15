@@ -67,7 +67,8 @@ export interface QrCodeFactory {
 
 export interface QRCodeModuleCandidate {
     create?: QrCodeFactory['create'];
-    default?: QrCodeFactory;
+    /** Partial allowed so invalid-module tests can pass `{}`. */
+    default?: Partial<QrCodeFactory> | QrCodeFactory;
 }
 
 export interface QrCodeSvgOptions {
@@ -110,7 +111,7 @@ export function resolveQrCodeModule(module: QRCodeModuleCandidate): QrCodeFactor
         return { create: module.create };
     }
     if (module.default?.create instanceof Function) {
-        return module.default;
+        return module.default as QrCodeFactory;
     }
     throw new Error('Le module "qrcode" n\'expose pas l\'API attendue.');
 }
@@ -126,7 +127,7 @@ async function getQrCodeModule(): Promise<QrCodeFactory> {
     }
 
     // Dans le navigateur, utiliser QRCode global si disponible (depuis qrcode/build/qrcode.min.js)
-    const runtime: BrowserGlobal = globalThis;
+    const runtime = globalThis as typeof globalThis & BrowserGlobal;
     if (runtime.window?.QRCode) {
         const resolved = resolveQrCodeModule(runtime.window.QRCode);
         cachedQrCodeModule = resolved;
@@ -135,7 +136,9 @@ async function getQrCodeModule(): Promise<QrCodeFactory> {
 
     // Dans Node.js ou si QRCode global n'est pas disponible, utiliser l'import dynamique
     const module = await import('qrcode');
-    const resolved = resolveQrCodeModule(module);
+    const resolved = resolveQrCodeModule(
+        module as unknown as QRCodeModuleCandidate,
+    );
     cachedQrCodeModule = resolved;
     return resolved;
 }
