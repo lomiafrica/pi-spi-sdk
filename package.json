@@ -38,7 +38,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "knip": "knip --no-config-hints",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\" \"*.{json,md}\" \"scripts/**/*.{js,ts}\"",
+    "format": "prettier --check \"src/**/*.{ts,tsx,json,md}\" \"*.{json,md}\" \"scripts/**/*.{js,ts}\"",
+    "format:fix": "prettier --write \"src/**/*.{ts,tsx,json,md}\" \"*.{json,md}\" \"scripts/**/*.{js,ts}\"",
     "prepublishOnly": "pnpm run generate && pnpm run build && pnpm run typecheck && pnpm test",
     "generate": "node scripts/pre-generate.js && openapi --input ./openapi.json --output ./src/generated --client axios --useOptions && node scripts/post-generate.js"
   },
