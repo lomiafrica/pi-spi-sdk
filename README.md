@@ -1,6 +1,6 @@
 # pi-spi-sdk
 
-> **This repository is a contribution from open-source payment processing company [lomi.](https://lomi.africa)**
+> **This repository is a contribution from [lomi.](https://lomi.africa), payment infrastructure for West Africa.**
 
 The Interoperable Platform for the Instant Payment System (π-SPI) is a regional payment infrastructure designed and operated by the Central Bank of West African States (BCEAO).
 
