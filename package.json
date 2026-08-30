@@ -1,7 +1,7 @@
 {
   "name": "pi-spi-sdk",
   "version": "0.2.0",
-  "description": "TypeScript SDK for the \u03c0-SPI Business API. Built by lomi. for the West African fintech community",
+  "description": "TypeScript SDK for the π-SPI Business API. Built by lomi. for the West African fintech community",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -85,22 +85,22 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "axios": "^1.13.2",
+    "@lomi./shared": "file:../../../packages/shared",
+    "axios": "^1.20.0",
     "dotenv": "^16.6.1",
-    "form-data": "^4.0.5",
-    "qrcode": "^1.5.4",
-    "@lomi./shared": "file:../../../packages/shared"
+    "form-data": "^4.0.6",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "@types/form-data": "^2.5.2",
-    "@types/node": "^20.19.25",
+    "@types/node": "^20.19.43",
     "@types/qrcode": "^1.5.6",
     "knip": "5.63.0",
     "openapi-typescript-codegen": "^0.29.0",
-    "prettier": "^3.6.2",
-    "tsup": "^8.5.0",
+    "prettier": "^3.9.6",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.11"
   },
   "pnpm": {
     "overrides": {
