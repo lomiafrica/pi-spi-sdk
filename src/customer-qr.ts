@@ -1,8 +1,4 @@
-import {
-  isJsonObject,
-  isString,
-  type JsonValue,
-} from "@lomi./shared";
+import { isJsonObject, isString, type JsonValue } from '@lomi./shared';
 
 export type LomiCustomerAliasType = 'SHID' | 'MBNO' | 'MCOD';
 
@@ -80,8 +76,6 @@ export function parseLomiCustomerQr(raw: string): LomiCustomerQr | null {
   };
 }
 
-function isAliasType(
-  value: JsonValue | undefined,
-): value is LomiCustomerAliasType {
+function isAliasType(value: JsonValue | undefined): value is LomiCustomerAliasType {
   return isString(value) && ALIAS_TYPES.some((aliasType) => aliasType === value);
 }

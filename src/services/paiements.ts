@@ -25,7 +25,7 @@
 
 import { BaseService } from './base';
 import type { QueryParams } from '../query-builder';
-import type { JsonObject } from "@lomi./shared";
+import type { JsonObject } from '@lomi./shared';
 
 export class PaiementsService extends BaseService {
   /**
@@ -90,9 +90,7 @@ export class PaiementsService extends BaseService {
     confirmation?: boolean;
     categorie?: string;
   }) {
-    const txId =
-      payment.txId ??
-      `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const txId = payment.txId ?? `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
     const payeurAlias = payment.payeurAlias ?? payment.comptePayeur;
     if (!payeurAlias) {
@@ -178,25 +176,17 @@ export class PaiementsService extends BaseService {
   /**
    * Confirm a payment that was created with confirmation: true
    */
-  async confirm(
-    txId: string,
-    decision: boolean,
-    body?: JsonObject
-  ) {
-    return this.request(
-      'PUT',
-      `/paiements/${encodeURIComponent(txId)}/confirmations`,
-      { decision, ...body }
-    );
+  async confirm(txId: string, decision: boolean, body?: JsonObject) {
+    return this.request('PUT', `/paiements/${encodeURIComponent(txId)}/confirmations`, {
+      decision,
+      ...body,
+    });
   }
 
   /**
    * Verify payment status by end-to-end ID
    */
   async verifyStatus(end2endId: string) {
-    return this.request(
-      'GET',
-      `/paiements/${encodeURIComponent(end2endId)}/statuts`
-    );
+    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}/statuts`);
   }
 }

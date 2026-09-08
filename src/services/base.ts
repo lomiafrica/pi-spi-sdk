@@ -2,12 +2,8 @@
  * Base service class with common error handling and HTTP request capability
  */
 
-import {
-  GeneratedApiError,
-  handleApiError,
-  parseGeneratedErrorBody,
-} from '../error-handler';
-import type { JsonValue } from "@lomi./shared";
+import { GeneratedApiError, handleApiError, parseGeneratedErrorBody } from '../error-handler';
+import type { JsonValue } from '@lomi./shared';
 
 export interface ApiHeaders {
   [name: string]: string;
@@ -40,9 +36,7 @@ export abstract class BaseService {
     try {
       return await operation();
     } catch (error) {
-      throw handleApiError(
-        error instanceof Error ? error : new Error('Unexpected request error'),
-      );
+      throw handleApiError(error instanceof Error ? error : new Error('Unexpected request error'));
     }
   }
 
@@ -53,11 +47,11 @@ export abstract class BaseService {
     method: string,
     path: string,
     body?: RequestBody,
-    params?: RequestParams,
+    params?: RequestParams
   ): Promise<T> {
     return this.execute(async () => {
       const url = new URL(`${this.config.BASE}${path}`);
-      
+
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
@@ -68,7 +62,7 @@ export abstract class BaseService {
 
       const headers: ApiHeaders = {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...this.config.HEADERS,
       };
 
@@ -102,7 +96,7 @@ export abstract class BaseService {
           url.toString(),
           response.status,
           response.statusText,
-          errorBody,
+          errorBody
         );
       }
 

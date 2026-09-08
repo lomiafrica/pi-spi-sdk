@@ -10,12 +10,7 @@ import {
   PiSpiRateLimitError,
   type ValidationErrors,
 } from './errors';
-import {
-  isJsonObject,
-  isString,
-  readString,
-  type JsonValue,
-} from "@lomi./shared";
+import { isJsonObject, isString, readString, type JsonValue } from '@lomi./shared';
 
 export interface GeneratedErrorBody {
   type?: string;
@@ -31,7 +26,7 @@ export class GeneratedApiError extends Error {
     public readonly url: string,
     public readonly status: number,
     public readonly statusText: string,
-    public readonly body: GeneratedErrorBody,
+    public readonly body: GeneratedErrorBody
   ) {
     super(body.detail ?? body.title ?? statusText);
     this.name = 'GeneratedApiError';
@@ -50,9 +45,7 @@ export function parseGeneratedErrorBody(value: JsonValue): GeneratedErrorBody {
   };
 }
 
-function readValidationErrors(
-  value: JsonValue | undefined,
-): ValidationErrors | undefined {
+function readValidationErrors(value: JsonValue | undefined): ValidationErrors | undefined {
   if (value === undefined || !isJsonObject(value)) return undefined;
   const result: ValidationErrors = {};
   for (const [field, messages] of Object.entries(value)) {

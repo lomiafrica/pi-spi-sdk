@@ -118,15 +118,15 @@ export class PiSpiSDK {
   constructor(config: PiSpiConfig) {
     // Initialize OpenAPI configuration synchronously
     // Note: This will work better after code generation when OpenAPI is properly exported
-    
+
     // Default config object
     this._config = {
-        BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
-        TOKEN: config.accessToken,
-        dispatcher: config.dispatcher,
-        HEADERS: {
-          ...config.headers,
-        },
+      BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
+      TOKEN: config.accessToken,
+      dispatcher: config.dispatcher,
+      HEADERS: {
+        ...config.headers,
+      },
     };
 
     try {
@@ -157,9 +157,9 @@ export class PiSpiSDK {
    */
   setAccessToken(token: string): void {
     if (this._config) {
-        this._config.TOKEN = token;
+      this._config.TOKEN = token;
     }
-    
+
     if (OpenAPI) {
       OpenAPI.TOKEN = token;
       OpenAPI.HEADERS = {

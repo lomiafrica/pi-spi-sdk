@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildLomiCustomerQr,
-  parseLomiCustomerQr,
-  serializeLomiCustomerQr,
-} from './customer-qr';
+import { buildLomiCustomerQr, parseLomiCustomerQr, serializeLomiCustomerQr } from './customer-qr';
 
 describe('customer-qr', () => {
   it('round-trips a SHID customer QR payload', () => {

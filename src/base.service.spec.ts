@@ -28,7 +28,7 @@ describe('BaseService.request', () => {
         headers: expect.objectContaining({
           Authorization: 'Bearer test-token',
         }),
-      }),
+      })
     );
     expect(result).toEqual({ id: 'wh-1', callbackUrl: 'https://example.com/hook' });
   });

@@ -84,20 +84,14 @@ export class RetoursFondsService extends BaseService {
       throw new Error('end2endId or txId is required for fund returns');
     }
 
-    return this.request(
-      'PUT',
-      `/paiements/${encodeURIComponent(end2endId)}/retours`
-    );
+    return this.request('PUT', `/paiements/${encodeURIComponent(end2endId)}/retours`);
   }
 
   /**
    * Get fund return details by end-to-end ID
    */
   async get(end2endId: string) {
-    return this.request(
-      'GET',
-      `/paiements/${encodeURIComponent(end2endId)}/statuts`
-    );
+    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}/statuts`);
   }
 
   /**

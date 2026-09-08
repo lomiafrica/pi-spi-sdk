@@ -168,9 +168,7 @@ export class ComptesService extends BaseService {
     motif?: string;
     txId?: string;
   }) {
-    const txId =
-      transfer.txId ??
-      `TRF-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const txId = transfer.txId ?? `TRF-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
     return this.request('POST', '/comptes/transactions', {
       txId,

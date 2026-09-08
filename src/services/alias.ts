@@ -57,7 +57,7 @@ export class AliasService extends BaseService {
     return this.request<{ cle?: string; type?: string; compte?: string }>(
       'POST',
       `/comptes/${encodeURIComponent(alias.compte)}/alias`,
-      { type: alias.type },
+      { type: alias.type }
     );
   }
 
@@ -84,7 +84,7 @@ export class AliasService extends BaseService {
 
     return this.request(
       'DELETE',
-      `/comptes/${encodeURIComponent(compte)}/alias/${encodeURIComponent(alias)}`,
+      `/comptes/${encodeURIComponent(compte)}/alias/${encodeURIComponent(alias)}`
     );
   }
 }

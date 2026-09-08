@@ -135,11 +135,7 @@ export class WebhooksService extends BaseService {
       alias?: string;
     }
   ) {
-    return this.request(
-      'PUT',
-      `/webhooks/${encodeURIComponent(id)}`,
-      webhook
-    );
+    return this.request('PUT', `/webhooks/${encodeURIComponent(id)}`, webhook);
   }
 
   /**

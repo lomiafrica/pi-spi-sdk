@@ -224,9 +224,7 @@ export class QueryBuilder {
     return this;
   }
 
-  private isOperator(
-    value: FilterOperator | string | number | boolean,
-  ): value is FilterOperator {
+  private isOperator(value: FilterOperator | string | number | boolean): value is FilterOperator {
     if (typeof value !== 'string') return false;
     return [
       'eq',

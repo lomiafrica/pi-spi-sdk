@@ -134,10 +134,7 @@ export class PaiementsEnMasseService extends BaseService {
    * ```
    */
   async get(instructionId: string) {
-    return this.request(
-      'GET',
-      `/paiements-groupes/${encodeURIComponent(instructionId)}`
-    );
+    return this.request('GET', `/paiements-groupes/${encodeURIComponent(instructionId)}`);
   }
 
   /**

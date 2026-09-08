@@ -87,21 +87,16 @@ export class DemandesAnnulationService extends BaseService {
       throw new Error('end2endId or txId is required for cancellation requests');
     }
 
-    return this.request(
-      'POST',
-      `/paiements/${encodeURIComponent(end2endId)}/annulations`,
-      { raison: request.motif }
-    );
+    return this.request('POST', `/paiements/${encodeURIComponent(end2endId)}/annulations`, {
+      raison: request.motif,
+    });
   }
 
   /**
    * Get cancellation request details by end-to-end ID
    */
   async get(end2endId: string) {
-    return this.request(
-      'GET',
-      `/paiements/${encodeURIComponent(end2endId)}/statuts`
-    );
+    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}/statuts`);
   }
 
   /**
@@ -115,10 +110,8 @@ export class DemandesAnnulationService extends BaseService {
    * Respond to a cancellation request (accept or reject)
    */
   async respond(end2endId: string, decision: boolean) {
-    return this.request(
-      'PUT',
-      `/paiements/${encodeURIComponent(end2endId)}/annulations/reponses`,
-      { decision }
-    );
+    return this.request('PUT', `/paiements/${encodeURIComponent(end2endId)}/annulations/reponses`, {
+      decision,
+    });
   }
 }

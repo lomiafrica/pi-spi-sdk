@@ -16,7 +16,7 @@ npm install pi-spi-sdk
 yarn add pi-spi-sdk
 ```
 
-π-SPI operates on a single currency, the XOF (West African CFA Franc), and processes payments in real-time with instant confirmation. It also enables **cross-border transactions** within the West African Economic and Monetary Union (UEMOA), which spans eight countries: Benin, Burkina Faso, Côte d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal, and Togo. 
+π-SPI operates on a single currency, the XOF (West African CFA Franc), and processes payments in real-time with instant confirmation. It also enables **cross-border transactions** within the West African Economic and Monetary Union (UEMOA), which spans eight countries: Benin, Burkina Faso, Côte d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal, and Togo.
 
 Payments can flow between traditional bank accounts across UEMOA countries, from bank accounts to mobile money wallets like MTN, Orange Money, and Moov, from mobile wallets back to bank accounts, and even between mobile money wallets regardless of which provider each person uses.
 
@@ -196,21 +196,23 @@ const payload = sdk.qr.payload({
 });
 
 // Generate SVG with official PI-SPI logo
-const svg = await sdk.qr.svg({
-  alias: '3497a720-ab11-4973-9619-534e04f263a1',
-  countryCode: 'CI',
-  qrType: 'DYNAMIC',
-  referenceLabel: 'TX-12345',
-  amount: 5000
-}, { size: 300 });
+const svg = await sdk.qr.svg(
+  {
+    alias: '3497a720-ab11-4973-9619-534e04f263a1',
+    countryCode: 'CI',
+    qrType: 'DYNAMIC',
+    referenceLabel: 'TX-12345',
+    amount: 5000,
+  },
+  { size: 300 }
+);
 
 // Validate external QR code content
 const check = sdk.qr.validate(someQrString);
 if (check.valid) {
-  console.log("Valid QR for:", check.data?.alias);
+  console.log('Valid QR for:', check.data?.alias);
 }
 ```
-
 
 #### Aliases
 
