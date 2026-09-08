@@ -55,7 +55,6 @@ interface QrMatrix {
   length?: number;
   data?: ArrayLike<boolean | number>;
   get?: (row: number, col: number) => boolean | number;
-  [row: number]: ArrayLike<boolean | number> | undefined;
 }
 
 interface QrCodeInstance {
@@ -130,13 +129,14 @@ function parseQrCodeImport(mod: QRCodeModuleCandidate): QRCodeModuleCandidate {
   return candidate;
 }
 
-function hasBrowserQrCode(
-  value: typeof globalThis
-): value is typeof globalThis & { window: { QRCode: QrCodeFactory | QRCodeModuleCandidate } } {
-  if (!('window' in value) || value.window === undefined || value.window === null) {
-    return false;
-  }
-  return 'QRCode' in value.window && value.window.QRCode !== undefined;
+type BrowserQrHost = {
+  window?: { QRCode?: QrCodeFactory | QRCodeModuleCandidate };
+};
+
+function browserQrCode(): QrCodeFactory | QRCodeModuleCandidate | undefined {
+  // SAFETY: qrcode UMD attaches QRCode on window; optional chaining is the host boundary.
+  const host = globalThis as BrowserQrHost;
+  return host.window?.QRCode;
 }
 
 export function resolveQrCodeModule(module: QRCodeModuleCandidate): QrCodeFactory {
@@ -160,29 +160,27 @@ async function getQrCodeModule(): Promise<QrCodeFactory> {
     return cachedQrCodeModule;
   }
 
-  // Dans le navigateur, utiliser QRCode global si disponible (depuis qrcode/build/qrcode.min.js)
-  if (hasBrowserQrCode(globalThis)) {
-    const qr = globalThis.window.QRCode;
+  const browserQr = browserQrCode();
+  if (browserQr) {
     const imported: QRCodeModuleCandidate = {};
-    if (isQrCreateFn(qr.create)) {
-      imported.create = qr.create;
+    if (isQrCreateFn(browserQr.create)) {
+      imported.create = browserQr.create;
     }
-    if ('default' in qr) {
-      imported.default = qr.default;
+    if ('default' in browserQr) {
+      imported.default = browserQr.default;
     }
     const resolved = resolveQrCodeModule(parseQrCodeImport(imported));
     cachedQrCodeModule = resolved;
     return resolved;
   }
 
-  // Dans Node.js ou si QRCode global n'est pas disponible, utiliser l'import dynamique
-  const module = await import('qrcode');
+  const loaded = await import("qrcode");
   const imported: QRCodeModuleCandidate = {};
-  if ('create' in module && isQrCreateFn(module.create)) {
-    imported.create = module.create;
+  if (isQrCreateFn(loaded.create)) {
+    imported.create = loaded.create;
   }
-  if ('default' in module) {
-    imported.default = module.default;
+  if (loaded.default) {
+    imported.default = loaded.default;
   }
   const resolved = resolveQrCodeModule(parseQrCodeImport(imported));
   cachedQrCodeModule = resolved;
@@ -906,9 +904,11 @@ function isDarkModule(modules: QrMatrix, moduleCount: number, row: number, col: 
     return Boolean(modules.get(row, col));
   }
 
-  const matrixRow = modules[row];
-  if (matrixRow) {
-    return Boolean(matrixRow[col]);
+  if (Array.isArray(modules)) {
+    const matrixRow = modules[row];
+    if (matrixRow) {
+      return Boolean(matrixRow[col]);
+    }
   }
 
   return false;
