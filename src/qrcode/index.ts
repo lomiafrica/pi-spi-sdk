@@ -174,7 +174,7 @@ async function getQrCodeModule(): Promise<QrCodeFactory> {
     return resolved;
   }
 
-  const loaded = await import("qrcode");
+  const loaded = await import('qrcode');
   const imported: QRCodeModuleCandidate = {};
   if (isQrCreateFn(loaded.create)) {
     imported.create = loaded.create;
