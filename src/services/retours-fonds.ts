@@ -91,13 +91,13 @@ export class RetoursFondsService extends BaseService {
    * Get fund return details by end-to-end ID
    */
   async get(end2endId: string) {
-    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}/statuts`);
+    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}`);
   }
 
   /**
    * List payments with fund return status filter
    */
   async list(params?: QueryParams & { retourStatut?: string }) {
-    return this.request('GET', '/paiements', undefined, params);
+    return this.request('GET', '/paiements-envoyes', undefined, params);
   }
 }

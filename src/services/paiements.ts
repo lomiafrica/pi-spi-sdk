@@ -101,7 +101,7 @@ export class PaiementsService extends BaseService {
       statut?: string;
       txId?: string;
       statutRaison?: string;
-    }>('POST', '/paiements', {
+    }>('POST', '/paiements-envoyes', {
       txId,
       payeurAlias,
       payeAlias: payment.payeAlias,
@@ -133,7 +133,7 @@ export class PaiementsService extends BaseService {
       dateEnvoi?: string;
       dateIrrevocabilite?: string;
       dateRejet?: string;
-    }>('GET', `/paiements/${encodeURIComponent(txId)}`);
+    }>('GET', `/paiements-envoyes/${encodeURIComponent(txId)}`);
   }
 
   /**
@@ -170,14 +170,14 @@ export class PaiementsService extends BaseService {
       statut?: string;
     }
   ) {
-    return this.request('GET', '/paiements', undefined, params);
+    return this.request('GET', '/paiements-envoyes', undefined, params);
   }
 
   /**
    * Confirm a payment that was created with confirmation: true
    */
   async confirm(txId: string, decision: boolean, body?: JsonObject) {
-    return this.request('PUT', `/paiements/${encodeURIComponent(txId)}/confirmations`, {
+    return this.request('PUT', `/paiements-envoyes/${encodeURIComponent(txId)}/confirmations`, {
       decision,
       ...body,
     });
@@ -187,6 +187,6 @@ export class PaiementsService extends BaseService {
    * Verify payment status by end-to-end ID
    */
   async verifyStatus(end2endId: string) {
-    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}/statuts`);
+    return this.request('GET', `/paiements/${encodeURIComponent(end2endId)}`);
   }
 }
