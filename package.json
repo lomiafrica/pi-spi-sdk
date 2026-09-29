@@ -97,7 +97,7 @@
     "@types/qrcode": "^1.5.6",
     "knip": "5.63.0",
     "openapi-typescript-codegen": "^0.29.0",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.9",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vite": "7.3.6",
