@@ -1,7 +1,7 @@
 {
   "name": "pi-spi-sdk",
   "version": "0.2.0",
-  "description": "TypeScript SDK for the π-SPI Business API. Built by lomi. for the African fintech community",
+  "description": "TypeScript SDK for the π-SPI Business API. Built by lomi. for the West African fintech community",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
