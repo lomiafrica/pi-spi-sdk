@@ -1,0 +1,12 @@
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+overrides:
+  nanoid: ^3.3.18
+  vite: 7.3.7
+  esbuild: 0.28.2
+  follow-redirects: 1.16.2
+  handlebars: 4.7.10
+  source-map-js: 1.2.2
+  zod: ^4.6.6
