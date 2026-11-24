@@ -8,7 +8,6 @@
 
 import { PiSpiSDK, QueryBuilder, AliasType } from './index';
 
-// Initialize the SDK
 const sdk = new PiSpiSDK({
   baseUrl: 'https://sandbox.api.pi-bceao.com/piz/v1',
   accessToken: process.env.PI_SPI_ACCESS_TOKEN!,

@@ -53,7 +53,6 @@ try {
   for (const [path, pathItem] of Object.entries(spec.paths)) {
     if (isObjectRecord(pathItem)) {
       for (const [key, value] of Object.entries(pathItem)) {
-        // Check if this is an HTTP method
         if (httpMethods.includes(key.toLowerCase())) {
           // Remove null operations (sometimes used to indicate method not available)
           if (value === null || value === undefined) {

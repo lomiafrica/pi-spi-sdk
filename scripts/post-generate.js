@@ -61,7 +61,6 @@ function fixEmptyTypes() {
       while ((match = emptyTypePattern.exec(content)) !== null) {
         const typeName = match[1];
 
-        // Check if we have a fix for this type
         if (emptyTypeFixes[typeName]) {
           content = content.replace(
             `export type ${typeName} = ;`,
@@ -109,10 +108,8 @@ function fixEmptyTypes() {
 try {
   let content = readFileSync(generatedOpenAPIPath, 'utf-8');
 
-  // Update the default BASE URL to match PI-SPI sandbox
   content = content.replace(/BASE: '.*'/, "BASE: 'https://sandbox.api.pi-bceao.com/piz/v1'");
 
-  // Update VERSION if needed
   content = content.replace(/VERSION: '.*'/, "VERSION: '1.0.0'");
 
   writeFileSync(generatedOpenAPIPath, content, 'utf-8');

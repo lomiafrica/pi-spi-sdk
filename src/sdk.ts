@@ -1,10 +1,3 @@
-/**
- * Main PI-SPI SDK class
- *
- * This is the entry point for interacting with the PI-SPI API.
- * Provides organized access to all API services.
- */
-
 import { handleApiError } from './error-handler';
 import type { PiSpiConfig } from './config';
 import { ApiConfig } from './services/base';
@@ -20,10 +13,8 @@ import { DemandesAnnulationService } from './services/demandes-annulation';
 import { QRCode } from './qrcode';
 
 // OpenAPI will be imported from generated code after running pnpm run generate
-// For now, we'll use a dynamic import approach
 let OpenAPI: ApiConfig;
 
-// Try to import generated OpenAPI config
 async function loadOpenAPI() {
   try {
     const generated = await import('./generated');
@@ -116,10 +107,6 @@ export class PiSpiSDK {
    * ```
    */
   constructor(config: PiSpiConfig) {
-    // Initialize OpenAPI configuration synchronously
-    // Note: This will work better after code generation when OpenAPI is properly exported
-
-    // Default config object
     this._config = {
       BASE: config.baseUrl || 'https://sandbox.api.pi-bceao.com/piz/v1',
       TOKEN: config.accessToken,
@@ -130,16 +117,11 @@ export class PiSpiSDK {
     };
 
     try {
-      // In a real scenario, we'd import this properly
-      // For now, we'll set it up directly
       OpenAPI = this._config;
-      // Also maintain the module level variable for backward compat if any
     } catch {
-      // Fallback configuration
       OpenAPI = this._config;
     }
 
-    // Initialize services with config
     this.comptes = new ComptesService(this._config);
     this.alias = new AliasService(this._config);
     this.webhooks = new WebhooksService(this._config);

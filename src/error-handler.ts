@@ -71,7 +71,6 @@ export function handleApiError(error: Error): never {
     const detail = body?.detail || apiError.message;
     const instance = body?.instance;
 
-    // Handle validation errors (400)
     if (status === 400) {
       const invalidParams = body?.invalidParams || body?.errors;
       throw new PiSpiValidationError(
@@ -84,7 +83,6 @@ export function handleApiError(error: Error): never {
       );
     }
 
-    // Handle authentication errors (401)
     if (status === 401) {
       throw new PiSpiAuthError(
         detail || title || 'Authentication failed',
@@ -93,7 +91,6 @@ export function handleApiError(error: Error): never {
       );
     }
 
-    // Handle forbidden errors (403)
     if (status === 403) {
       throw new PiSpiError(
         detail || title || 'Forbidden',
@@ -105,7 +102,6 @@ export function handleApiError(error: Error): never {
       );
     }
 
-    // Handle not found errors (404)
     if (status === 404) {
       throw new PiSpiNotFoundError(
         detail || title || 'Resource not found',
@@ -114,7 +110,6 @@ export function handleApiError(error: Error): never {
       );
     }
 
-    // Handle rate limit errors (429)
     if (status === 429) {
       // Retry-After header would be in the response, but ApiError doesn't expose it
       // This can be enhanced if needed
@@ -125,7 +120,6 @@ export function handleApiError(error: Error): never {
       );
     }
 
-    // Handle other errors
     throw new PiSpiError(
       detail || title || apiError.message || 'API error',
       status,
