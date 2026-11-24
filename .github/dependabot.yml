@@ -4,7 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+    # The updater clones this repo alone and cannot reach the
+    # file:../../../packages/shared dep, so every npm version job fails.
+    # Advisories still surface through Dependabot alerts and are
+    # remediated by hand.
+    open-pull-requests-limit: 0
     groups:
       minor-patch:
         update-types: ["minor", "patch"]
